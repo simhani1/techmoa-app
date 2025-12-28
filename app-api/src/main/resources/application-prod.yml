@@ -5,6 +5,9 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+  flyway:
+    baseline-on-migrate: true
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_URL}:3306/techmoa?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
