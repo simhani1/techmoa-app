@@ -1,4 +1,4 @@
-package site.techmoa.app
+package site.techmoa.app.api
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

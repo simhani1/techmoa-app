@@ -1,4 +1,4 @@
-package site.techmoa.app
+package site.techmoa.app.api
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
