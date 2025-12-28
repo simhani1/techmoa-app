@@ -20,7 +20,7 @@ class Blog(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "operation_status", nullable = false, length = 20)
-    private var operationStatus: OperationStatus = OperationStatus.ACTIVE
+    private var _status: OperationStatus = OperationStatus.ACTIVE,
 ) : BaseEntity() {
 
     companion object {
@@ -33,12 +33,15 @@ class Blog(
         }
     }
 
+    val status: OperationStatus
+        get() = _status
+
     fun delete() {
-        this.operationStatus = OperationStatus.DELETED
+        _status = OperationStatus.DELETED
     }
 
     fun pause() {
-        this.operationStatus = OperationStatus.PAUSED
+        _status = OperationStatus.PAUSED
     }
 }
 
