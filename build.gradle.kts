@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -45,11 +44,5 @@ subprojects {
 		compilerOptions {
 			freeCompilerArgs.add("-Xjsr305=strict")
 		}
-	}
-
-	extensions.configure<AllOpenExtension> {
-		annotation("jakarta.persistence.Entity")
-		annotation("jakarta.persistence.MappedSuperclass")
-		annotation("jakarta.persistence.Embeddable")
 	}
 }
