@@ -4,7 +4,15 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "article")
+@Table(
+    name = "article",
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_article_blog_guid",
+            columnNames = ["blog_id", "guid"]
+        )
+    ]
+)
 class Article(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id", nullable = false)
@@ -16,10 +24,10 @@ class Article(
     @Column(name = "title", nullable = false, length = 500)
     val title: String,
 
-    @Column(name = "link", nullable = false, length = 1000)
+    @Column(name = "link", nullable = false, length = 600)
     val link: String,
 
-    @Column(name = "guid", nullable = false, length = 1000)
+    @Column(name = "guid", nullable = false, length = 600)
     val guid: String,
 
     @Column(name = "pub_date", nullable = false)

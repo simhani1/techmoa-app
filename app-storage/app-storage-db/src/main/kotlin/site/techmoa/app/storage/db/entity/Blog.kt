@@ -9,13 +9,13 @@ class Blog(
     @Column(name = "blog_id", nullable = false)
     var id: Long? = null,
 
-    @Column(name = "link", nullable = false, length = 1000)
+    @Column(name = "link", nullable = false, length = 600)
     val link: String,
 
-    @Column(name = "logo_url", length = 1000)
+    @Column(name = "logo_url", length = 600)
     val logoUrl: String,
 
-    @Column(name = "rss_link", nullable = false, length = 1000)
+    @Column(name = "rss_link", nullable = false, length = 600)
     val rssLink: String,
 
     @Enumerated(EnumType.STRING)
