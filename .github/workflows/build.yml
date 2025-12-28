@@ -2,7 +2,7 @@ name: Build with Gradle
 
 on:
   pull_request:
-    branches: [ "dev", "release", "main" ]
+    branches: [ "develop", "release", "main" ]
     types: [ opened, reopened, synchronize ]
   workflow_dispatch:
 
