@@ -1,53 +1,48 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-	kotlin("jvm") version "1.9.25"
-	kotlin("plugin.spring") version "1.9.25"
-	id("org.springframework.boot") version "3.5.9"
-	id("io.spring.dependency-management") version "1.1.7"
-	kotlin("plugin.jpa") version "1.9.25"
+	kotlin("jvm") version "1.9.25" apply false
+	kotlin("plugin.spring") version "1.9.25" apply false
+	id("org.springframework.boot") version "3.5.9" apply false
+	id("io.spring.dependency-management") version "1.1.7" apply false
+	kotlin("plugin.jpa") version "1.9.25" apply false
 }
 
-group = "site"
-version = "0.0.1-SNAPSHOT"
-description = "Demo project for Spring Boot"
+allprojects {
+	group = "site"
+	version = "0.0.1-SNAPSHOT"
+	description = "TechMoa Application"
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+	repositories {
+		mavenCentral()
 	}
 }
 
-repositories {
-	mavenCentral()
-}
+subprojects {
+	apply(plugin = "org.jetbrains.kotlin.jvm")
+	apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+	apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+	apply(plugin = "io.spring.dependency-management")
 
-dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation ("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.flywaydb:flyway-core")
-	implementation("org.flywaydb:flyway-mysql")
-	runtimeOnly ("io.micrometer:micrometer-registry-prometheus")
-	runtimeOnly("com.mysql:mysql-connector-j")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	testRuntimeOnly("com.h2database:h2")
-}
-
-kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll("-Xjsr305=strict")
+	extensions.configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
+		imports {
+			mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.9")
+		}
 	}
-}
 
-allOpen {
-	annotation("jakarta.persistence.Entity")
-	annotation("jakarta.persistence.MappedSuperclass")
-	annotation("jakarta.persistence.Embeddable")
-}
+	tasks.withType<Test> {
+		useJUnitPlatform()
+	}
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+	extensions.configure<JavaPluginExtension> {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(17)
+		}
+	}
+
+	tasks.withType<KotlinCompile>().configureEach {
+		compilerOptions {
+			freeCompilerArgs.add("-Xjsr305=strict")
+		}
+	}
 }
