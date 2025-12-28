@@ -12,7 +12,7 @@ plugins {
 allprojects {
 	group = "site"
 	version = "0.0.1-SNAPSHOT"
-	description = "Techmoa Application"
+	description = "TechMoa Application"
 
 	repositories {
 		mavenCentral()
@@ -24,6 +24,12 @@ subprojects {
 	apply(plugin = "org.jetbrains.kotlin.plugin.spring")
 	apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
 	apply(plugin = "io.spring.dependency-management")
+
+	extensions.configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
+		imports {
+			mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.9")
+		}
+	}
 
 	tasks.withType<Test> {
 		useJUnitPlatform()

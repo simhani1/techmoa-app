@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation(project(":app-core"))
+    implementation(project(":app-batch:app-batch-rss"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
