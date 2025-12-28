@@ -9,12 +9,14 @@ import io.kotest.matchers.shouldBe
 
 class BlogTest : DescribeSpec({
 
-    describe("Blog의") {
-        val fixtureMonkey = FixtureMonkey.builder()
-            .plugin(KotlinPlugin())
-            .build()
+    lateinit var blog: Blog
 
-        val blog: Blog = fixtureMonkey.giveMeBuilder<Blog>()
+    val fixtureMonkey = FixtureMonkey.builder()
+        .plugin(KotlinPlugin())
+        .build()
+
+    beforeTest {
+        blog = fixtureMonkey.giveMeBuilder<Blog>()
             .instantiateBy {
                 factory<Blog>("of") {
                     parameter<String>("link")
@@ -26,6 +28,9 @@ class BlogTest : DescribeSpec({
             .set("logoUrl", "http://logoUrl.com")
             .set("rssLink", "http://rssLink.com")
             .sample()
+    }
+
+    describe("Blog의") {
         context("of()를 호출하면") {
             it("ACTIVE 상태의 Blog를 생성한다.") {
                 blog.status.shouldBe(OperationStatus.ACTIVE)

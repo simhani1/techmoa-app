@@ -34,7 +34,7 @@ class Article(
     val pubDate: LocalDateTime,
 
     @Column(name = "views", nullable = false)
-    private var views: Int = 0,
+    private var _views: Int = 0,
 ) : BaseEntity() {
 
     companion object {
@@ -49,7 +49,11 @@ class Article(
         }
     }
 
+    fun getViews(): Int {
+        return _views
+    }
+
     fun increaseViews(amount: Int = 1) {
-        this.views += amount
+        _views += amount
     }
 }
