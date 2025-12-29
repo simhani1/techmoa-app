@@ -33,19 +33,19 @@ class BlogTest : DescribeSpec({
     describe("Blog의") {
         context("of()를 호출하면") {
             it("ACTIVE 상태의 Blog를 생성한다.") {
-                blog.status.shouldBe(OperationStatus.ACTIVE)
+                blog.status.shouldBe(BlogStatus.ACTIVE)
             }
         }
         context("delete()를 호출하면") {
             it("DELETED 상태로 변경한다.") {
                 blog.delete()
-                blog.status.shouldBe(OperationStatus.DELETED)
+                blog.status.shouldBe(BlogStatus.DELETED)
             }
         }
         context("pause()를 호출하면") {
             it("PAUSED 상태로 변경한다.") {
                 blog.pause()
-                blog.status.shouldBe(OperationStatus.PAUSED)
+                blog.status.shouldBe(BlogStatus.PAUSED)
             }
         }
     }
