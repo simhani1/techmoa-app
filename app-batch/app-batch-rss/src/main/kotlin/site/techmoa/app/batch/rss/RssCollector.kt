@@ -18,7 +18,11 @@ class RssCollector(
     val articleRepository: ArticleRepository,
 ) {
 
-    @Scheduled(cron = "0 * * * * *")
+    companion object {
+        const val EVERY_30_MINUTES = "0 1/30 * * * *"
+    }
+
+    @Scheduled(cron = EVERY_30_MINUTES)
     @Transactional
     fun saveNewArticles() {
         // 1. 블로그마다 rssLink에서 아티클을 수집한다
