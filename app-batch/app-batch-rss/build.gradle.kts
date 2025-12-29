@@ -1,5 +1,6 @@
 dependencies {
     implementation(project(":app-core"))
+    implementation(project(":app-storage:app-storage-db"))
 
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-context-support")
