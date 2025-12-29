@@ -1,6 +1,6 @@
 package site.techmoa.app.storage.db.entity
 
-enum class OperationStatus {
+enum class BlogStatus {
     ACTIVE,
     DELETED,
     PAUSED,

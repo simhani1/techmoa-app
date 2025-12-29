@@ -20,7 +20,7 @@ class Blog(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "operation_status", nullable = false, length = 20)
-    private var _status: OperationStatus = OperationStatus.ACTIVE,
+    private var _status: BlogStatus = BlogStatus.ACTIVE,
 ) : BaseEntity() {
 
     companion object {
@@ -33,16 +33,26 @@ class Blog(
         }
     }
 
-    val status: OperationStatus
+    val status: BlogStatus
         get() = _status
 
     fun delete() {
-        _status = OperationStatus.DELETED
+        _status = BlogStatus.DELETED
     }
 
     fun pause() {
-        _status = OperationStatus.PAUSED
+        _status = BlogStatus.PAUSED
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Blog) return false
+        if (id == null || other.id == null) return false
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
     }
 }
-
 
