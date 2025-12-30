@@ -10,8 +10,6 @@ import site.techmoa.app.storage.db.entity.BlogEntity
 import site.techmoa.app.storage.db.entity.BlogStatus
 import site.techmoa.app.storage.db.repository.ArticleRepository
 import site.techmoa.app.storage.db.repository.BlogRepository
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 @Component
 class RssCollector(
@@ -21,9 +19,10 @@ class RssCollector(
 
     companion object {
         const val EVERY_30_MINUTES = "0 1/30 * * * *"
+        const val EVERY_MINUTES = "0 * * * * *"
     }
 
-    @Scheduled(cron = EVERY_30_MINUTES)
+    @Scheduled(cron = EVERY_MINUTES)
     @Transactional
     fun saveNewArticles() {
         // 1. 블로그마다 rssLink에서 아티클을 수집한다
@@ -70,11 +69,9 @@ class RssCollector(
     }
 
     private fun parseToEpochMillis(item: Item): Long? {
-        return item.pubDate.get().let {
-            ZonedDateTime.parse(it, DateTimeFormatter.RFC_1123_DATE_TIME)
-                .toInstant()
-                .toEpochMilli()
-        }
+        return item.pubDateAsZonedDateTime.orElse(null)
+            ?.toInstant()
+            ?.toEpochMilli()
     }
 
     private fun isNewArticle(articleEntity: ArticleEntity): Boolean {
