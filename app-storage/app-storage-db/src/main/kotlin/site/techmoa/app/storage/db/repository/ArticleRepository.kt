@@ -10,5 +10,5 @@ interface ArticleRepository : JpaRepository<ArticleEntity, Long> {
     fun existsByBlogIdAndGuid(blogId: Long, guid: String): Boolean
 
     @Query(" select a from ArticleEntity a where (:cursor is null or a.pubDate < :cursor) order by a.pubDate desc")
-    fun findPublishedAfter(@Param("cursor") cursor: Long?, toPageable: Pageable): List<ArticleEntity>
+    fun findPublishedAfter(@Param("cursor") cursor: Long?, pageable: Pageable): List<ArticleEntity>
 }
