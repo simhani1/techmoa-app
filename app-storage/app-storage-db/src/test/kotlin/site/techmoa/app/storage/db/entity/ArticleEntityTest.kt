@@ -8,18 +8,18 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import kotlin.random.Random
 
-class ArticleTest : DescribeSpec({
+class ArticleEntityTest : DescribeSpec({
 
-    lateinit var article: Article
+    lateinit var article: ArticleEntity
 
     val fixtureMonkey = FixtureMonkey.builder()
         .plugin(KotlinPlugin())
         .build()
 
     beforeTest {
-        article = fixtureMonkey.giveMeBuilder<Article>()
+        article = fixtureMonkey.giveMeBuilder<ArticleEntity>()
             .instantiateBy {
-                factory<Article>("of")
+                factory<ArticleEntity>("of")
             }
             .sample()
     }
