@@ -19,16 +19,12 @@ class ArticleServiceTest: ArticleServiceUnitTest() {
         // GIVEN
         val offsetLimit = OffsetLimit(limit = 20)
 
-        val fetchOffsetLimit = OffsetLimit(limit = 21)
         val blogs = BlogFixture.giveMe(3)
         val articles = blogs.flatMap { ArticleFixture.giveMe(7, it.id) }
 
         // WHEN
         every { articleFinder.findPublishedAfter(null, any<OffsetLimit>()) } returns articles
-        every { blogFinder.findById(any<Long>()) }answers {
-            val id = firstArg<Long>()
-            blogs.first { it.id == id }
-        }
+        every { blogFinder.findByIds(any()) } returns blogs
 
         val page = articleService.getArticles(cursor = null, limit = offsetLimit.limit)
 
@@ -43,16 +39,12 @@ class ArticleServiceTest: ArticleServiceUnitTest() {
         // GIVEN
         val offsetLimit = OffsetLimit(limit = 20)
 
-        val fetchOffsetLimit = OffsetLimit(limit = 21)
         val blogs = BlogFixture.giveMe(2)
         val articles = blogs.flatMap { ArticleFixture.giveMe(10, it.id) }
 
         // WHEN
         every { articleFinder.findPublishedAfter(null, any<OffsetLimit>()) } returns articles
-        every { blogFinder.findById(any<Long>()) } answers {
-            val id = firstArg<Long>()
-            blogs.first { it.id == id }
-        }
+        every { blogFinder.findByIds(any()) } returns blogs
 
         val page = articleService.getArticles(cursor = null, limit = offsetLimit.limit)
 
@@ -67,16 +59,12 @@ class ArticleServiceTest: ArticleServiceUnitTest() {
         // GIVEN
         val offsetLimit = OffsetLimit(limit = 20)
 
-        val fetchOffsetLimit = OffsetLimit(limit = 0)
         val blogs = BlogFixture.giveMe(2)
         val articles = blogs.flatMap { ArticleFixture.giveMe(0, it.id) }
 
         // WHEN
         every { articleFinder.findPublishedAfter(null, any<OffsetLimit>()) } returns articles
-        every { blogFinder.findById(any<Long>()) } answers {
-            val id = firstArg<Long>()
-            blogs.first { it.id == id }
-        }
+        every { blogFinder.findByIds(any()) } returns blogs
 
         val page = articleService.getArticles(cursor = null, limit = offsetLimit.limit)
 

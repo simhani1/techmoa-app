@@ -12,7 +12,12 @@ class BlogFinder(
 ) {
     @Transactional(readOnly = true)
     fun findById(id: Long): Blog {
-        val blogEntity = blogRepository.findByIdOrNull(id) ?: throw RuntimeException("Blog with id $id not found")
-        return Blog(id = blogEntity.id, name = blogEntity.link)
+        val blog = blogRepository.findByIdOrNull(id) ?: throw RuntimeException("Blog with id $id not found")
+        return Blog(id = blog.id, name = blog.link)
+    }
+
+    @Transactional(readOnly = true)
+    fun findByIds(ids: List<Long>): List<Blog> {
+        return blogRepository.findAllById(ids).map { Blog(id = it.id, name = it.link) }
     }
 }
