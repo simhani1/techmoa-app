@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import site.techmoa.app.article.domain.ArticleContent
 import site.techmoa.app.article.service.ArticleService
+import site.techmoa.app.core.Page
 import site.techmoa.app.core.response.ApiResponse
-import site.techmoa.app.core.response.Page
 
 @RestController
 class ArticleController(
