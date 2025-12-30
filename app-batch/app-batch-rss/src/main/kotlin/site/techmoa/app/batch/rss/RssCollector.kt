@@ -5,12 +5,11 @@ import com.apptasticsoftware.rssreader.RssReader
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.app.storage.db.entity.Article
-import site.techmoa.app.storage.db.entity.Blog
+import site.techmoa.app.storage.db.entity.ArticleEntity
+import site.techmoa.app.storage.db.entity.BlogEntity
 import site.techmoa.app.storage.db.entity.BlogStatus
 import site.techmoa.app.storage.db.repository.ArticleRepository
 import site.techmoa.app.storage.db.repository.BlogRepository
-import java.time.LocalDateTime
 
 @Component
 class RssCollector(
@@ -20,6 +19,7 @@ class RssCollector(
 
     companion object {
         const val EVERY_30_MINUTES = "0 1/30 * * * *"
+        const val EVERY_MINUTE = "0 * * * * *"
     }
 
     @Scheduled(cron = EVERY_30_MINUTES)
@@ -32,18 +32,18 @@ class RssCollector(
         saveUniqueArticles(collectedItems)
     }
 
-    private fun loadActiveBlogs(): List<Blog> {
+    private fun loadActiveBlogs(): List<BlogEntity> {
         return blogRepository.findAllStatus(status = BlogStatus.ACTIVE)
     }
 
-    private fun collectItemsByBlog(blogs: List<Blog>): Map<Blog, List<Item>> {
+    private fun collectItemsByBlog(blogEntities: List<BlogEntity>): Map<BlogEntity, List<Item>> {
         val rssReader = RssReader()
-        return blogs.associateWith { blog ->
+        return blogEntities.associateWith { blog ->
             rssReader.read(blog.rssLink).toList()
         }
     }
 
-    private fun saveUniqueArticles(collectedItems: Map<Blog, List<Item>>) {
+    private fun saveUniqueArticles(collectedItems: Map<BlogEntity, List<Item>>) {
         for ((blog, items) in collectedItems) {
             val newArticles = items.mapNotNull { item -> toArticle(blog, item) }
                 .filter { article -> isNewArticle(article) }
@@ -53,29 +53,28 @@ class RssCollector(
         }
     }
 
-    private fun toArticle(blog: Blog, item: Item): Article? {
-        val blogId = blog.id ?: return null
+    private fun toArticle(blog: BlogEntity, item: Item): ArticleEntity? {
+        val blogId = blog.id
         val title = item.title.orElse(null) ?: return null
         val link = item.link.orElse(null) ?: return null
         val guid = item.guid.orElse(null) ?: link
-        val publishedAt = extractPublishedAt(item) ?: return null
-        return Article.of(
+        val pubDate = parseToEpochMillis(item) ?: return null
+        return ArticleEntity.of(
             blogId = blogId,
             title = title,
             link = link,
             guid = guid,
-            pubDate = publishedAt
+            pubDate = pubDate
         )
     }
 
-    private fun extractPublishedAt(item: Item): LocalDateTime? {
-        val pubDate = item.pubDateAsZonedDateTime.orElse(null)
-            ?: item.updatedAsZonedDateTime.orElse(null)
-            ?: return null
-        return pubDate.toLocalDateTime()
+    private fun parseToEpochMillis(item: Item): Long? {
+        return item.pubDateAsZonedDateTime.orElse(null)
+            ?.toInstant()
+            ?.toEpochMilli()
     }
 
-    private fun isNewArticle(article: Article): Boolean {
-        return !articleRepository.existsByBlogIdAndGuid(article.blogId, article.guid)
+    private fun isNewArticle(articleEntity: ArticleEntity): Boolean {
+        return !articleRepository.existsByBlogIdAndGuid(articleEntity.blogId, articleEntity.guid)
     }
 }

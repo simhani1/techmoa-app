@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":app-core"))
     implementation(project(":app-batch:app-batch-rss"))
     implementation(project(":app-storage:app-storage-db"))
 

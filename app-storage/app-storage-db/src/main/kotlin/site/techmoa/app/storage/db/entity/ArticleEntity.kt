@@ -1,7 +1,6 @@
 package site.techmoa.app.storage.db.entity
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
 
 @Entity
 @Table(
@@ -13,10 +12,10 @@ import java.time.LocalDateTime
         )
     ]
 )
-class Article(
+class ArticleEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id", nullable = false)
-    var id: Long? = null,
+    var id: Long = 0L,
 
     @Column(name = "blog_id", nullable = false)
     val blogId: Long,
@@ -31,7 +30,7 @@ class Article(
     val guid: String,
 
     @Column(name = "pub_date", nullable = false)
-    val pubDate: LocalDateTime,
+    val pubDate: Long,
 
     @Column(name = "views", nullable = false)
     private var _views: Int = 0,
@@ -43,9 +42,9 @@ class Article(
             title: String,
             link: String,
             guid: String,
-            pubDate: LocalDateTime,
-        ): Article {
-            return Article(null, blogId, title, link, guid, pubDate)
+            pubDate: Long,
+        ): ArticleEntity {
+            return ArticleEntity(0L, blogId, title, link, guid, pubDate)
         }
     }
 

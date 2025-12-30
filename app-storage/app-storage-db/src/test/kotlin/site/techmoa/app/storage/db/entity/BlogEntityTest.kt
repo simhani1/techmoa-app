@@ -7,18 +7,18 @@ import com.navercorp.fixturemonkey.kotlin.instantiator.instantiateBy
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 
-class BlogTest : DescribeSpec({
+class BlogEntityTest : DescribeSpec({
 
-    lateinit var blog: Blog
+    lateinit var blog: BlogEntity
 
     val fixtureMonkey = FixtureMonkey.builder()
         .plugin(KotlinPlugin())
         .build()
 
     beforeTest {
-        blog = fixtureMonkey.giveMeBuilder<Blog>()
+        blog = fixtureMonkey.giveMeBuilder<BlogEntity>()
             .instantiateBy {
-                factory<Blog>("of") {
+                factory<BlogEntity>("of") {
                     parameter<String>("link")
                     parameter<String>("logoUrl")
                     parameter<String>("rssLink")

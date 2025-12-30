@@ -4,10 +4,10 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "blog")
-class Blog(
+class BlogEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "blog_id", nullable = false)
-    var id: Long? = null,
+    var id: Long = 0L,
 
     @Column(name = "link", nullable = false, length = 600)
     val link: String,
@@ -28,8 +28,8 @@ class Blog(
             link: String,
             logoUrl: String,
             rssLink: String
-        ): Blog {
-            return Blog(null, link, logoUrl, rssLink)
+        ): BlogEntity {
+            return BlogEntity(0L, link, logoUrl, rssLink)
         }
     }
 
@@ -46,8 +46,8 @@ class Blog(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Blog) return false
-        if (id == null || other.id == null) return false
+        if (other !is BlogEntity) return false
+        if (id == 0L || other.id == 0L) return false
         return id == other.id
     }
 
