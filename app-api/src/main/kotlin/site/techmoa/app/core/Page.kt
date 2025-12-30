@@ -1,4 +1,4 @@
-package site.techmoa.app.core.response
+package site.techmoa.app.core
 
 data class Page<T>(
     val data: List<T>,

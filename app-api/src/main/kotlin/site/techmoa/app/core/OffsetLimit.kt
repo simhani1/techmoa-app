@@ -1,4 +1,4 @@
-package site.techmoa.app.core.response
+package site.techmoa.app.core
 
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -9,5 +9,8 @@ data class OffsetLimit(
 ) {
     fun toPageable(): Pageable {
         return PageRequest.of(offset / limit, limit)
+    }
+    fun toCursorPageable(): Pageable {
+        return PageRequest.of(offset / limit, limit + 1)
     }
 }

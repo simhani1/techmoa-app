@@ -3,7 +3,7 @@ package site.techmoa.app.article.support
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import site.techmoa.app.article.domain.Article
-import site.techmoa.app.core.response.OffsetLimit
+import site.techmoa.app.core.OffsetLimit
 import site.techmoa.app.storage.db.repository.ArticleRepository
 
 @Component
@@ -12,7 +12,7 @@ class ArticleFinder(
 ) {
     @Transactional(readOnly = true)
     fun findPublishedAfter(cursor: Long?, offsetLimit: OffsetLimit): List<Article> {
-        val contents = articleRepository.findPublishedAfter(cursor, offsetLimit.toPageable())
+        val contents = articleRepository.findPublishedAfter(cursor, offsetLimit.toCursorPageable())
             .map { it ->
                 Article(
                     id = it.id,
