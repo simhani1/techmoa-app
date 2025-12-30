@@ -26,7 +26,7 @@ class ArticleEntityTest : DescribeSpec({
 
     describe("Article의") {
         context("기본 조회수는") {
-            it("0이다.") {
+            it("0이다") {
                 article.getViews().shouldBe(0)
             }
         }
