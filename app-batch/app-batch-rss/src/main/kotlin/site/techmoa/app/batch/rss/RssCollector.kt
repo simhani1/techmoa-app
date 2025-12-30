@@ -19,7 +19,7 @@ class RssCollector(
 
     companion object {
         const val EVERY_30_MINUTES = "0 1/30 * * * *"
-        const val EVERY_MINUTES = "0 * * * * *"
+        const val EVERY_MINUTE = "0 * * * * *"
     }
 
     @Scheduled(cron = EVERY_30_MINUTES)
