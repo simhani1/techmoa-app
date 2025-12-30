@@ -12,6 +12,9 @@ class BlogEntity(
     @Column(name = "link", nullable = false, length = 600)
     val link: String,
 
+    @Column(name = "name", nullable = false, length = 20)
+    val name: String,
+
     @Column(name = "logo_url", length = 600)
     val logoUrl: String,
 
@@ -26,10 +29,16 @@ class BlogEntity(
     companion object {
         fun of(
             link: String,
+            name: String,
             logoUrl: String,
             rssLink: String
         ): BlogEntity {
-            return BlogEntity(0L, link, logoUrl, rssLink)
+            return BlogEntity(
+                link = link,
+                name = name,
+                logoUrl = logoUrl,
+                rssLink = rssLink
+            )
         }
     }
 
