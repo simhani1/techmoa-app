@@ -10,7 +10,7 @@ data class OffsetLimit(
     fun toPageable(): Pageable {
         return PageRequest.of(offset / limit, limit)
     }
-    fun toPageableWithCursor(): Pageable {
+    fun toCursorPageable(): Pageable {
         return PageRequest.of(offset / limit, limit + 1)
     }
 }

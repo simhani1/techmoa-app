@@ -12,7 +12,7 @@ class ArticleFinder(
 ) {
     @Transactional(readOnly = true)
     fun findPublishedAfter(cursor: Long?, offsetLimit: OffsetLimit): List<Article> {
-        val contents = articleRepository.findPublishedAfter(cursor, offsetLimit.toPageableWithCursor())
+        val contents = articleRepository.findPublishedAfter(cursor, offsetLimit.toCursorPageable())
             .map { it ->
                 Article(
                     id = it.id,
