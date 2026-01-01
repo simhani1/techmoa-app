@@ -15,8 +15,6 @@ class CollectItemsByBlogHandler : RssCollectHandler {
 
     override fun handle(context: RssCollectContext, chain: RssCollectHandlerChain) {
         if (context.blogs.isEmpty()) {
-            context.collectedItems = emptyMap()
-            chain.next(context)
             return
         }
 
