@@ -2,39 +2,38 @@ package site.techmoa.app.batch.rss.collector.rssreader.handler.chain
 
 import com.apptasticsoftware.rssreader.Item
 import org.springframework.stereotype.Component
-import site.techmoa.app.batch.rss.collector.rssreader.handler.AbstractRssCollectHandler
+import org.springframework.transaction.annotation.Transactional
 import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectContext
+import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectHandler
+import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectHandlerChain
 import site.techmoa.app.storage.db.entity.ArticleEntity
 import site.techmoa.app.storage.db.entity.BlogEntity
 import site.techmoa.app.storage.db.repository.ArticleRepository
 
 @Component
-class SaveUniqueArticlesHandler(
+class FilterNewArticlesHandler(
     private val articleRepository: ArticleRepository,
-) : AbstractRssCollectHandler() {
+) : RssCollectHandler {
 
     override fun getOrder(): Int {
-        return 10
+        return 3
     }
 
-    override fun handle(context: RssCollectContext) {
+    @Transactional(readOnly = true)
+    override fun handle(context: RssCollectContext, chain: RssCollectHandlerChain) {
+        val newArticles = mutableListOf<ArticleEntity>()
         for ((blog, items) in context.collectedItems) {
-            saveNewArticles(filterNewArticles(items, blog))
+            newArticles.addAll(filterNewArticles(items, blog))
         }
-        handleNext(context)
+        context.newArticles = newArticles
+        chain.next(context)
     }
 
-    private fun saveNewArticles(newArticles: List<ArticleEntity>) {
-        if (newArticles.isNotEmpty()) {
-            articleRepository.saveAll(newArticles)
-        }
+    private fun filterNewArticles(items: List<Item>, blog: BlogEntity): List<ArticleEntity> {
+        val filtered = items.mapNotNull { item -> toArticle(blog, item) }
+            .filter { article -> isNewArticle(article) }
+        return filtered
     }
-
-    private fun filterNewArticles(
-        items: List<Item>,
-        blog: BlogEntity
-    ): List<ArticleEntity> = items.mapNotNull { item -> toArticle(blog, item) }
-        .filter { article -> isNewArticle(article) }
 
     private fun toArticle(blog: BlogEntity, item: Item): ArticleEntity? {
         val blogId = blog.id

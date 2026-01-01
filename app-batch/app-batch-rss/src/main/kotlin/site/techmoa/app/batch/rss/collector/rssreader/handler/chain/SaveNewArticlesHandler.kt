@@ -5,21 +5,23 @@ import org.springframework.transaction.annotation.Transactional
 import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectContext
 import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectHandler
 import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectHandlerChain
-import site.techmoa.app.storage.db.entity.BlogStatus
-import site.techmoa.app.storage.db.repository.BlogRepository
+import site.techmoa.app.storage.db.repository.ArticleRepository
 
 @Component
-class LoadActiveBlogsHandler(
-    private val blogRepository: BlogRepository,
+class SaveNewArticlesHandler(
+    private val articleRepository: ArticleRepository,
 ) : RssCollectHandler {
 
     override fun getOrder(): Int {
-        return 1
+        return 100
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     override fun handle(context: RssCollectContext, chain: RssCollectHandlerChain) {
-        context.blogs = blogRepository.findAllStatus(status = BlogStatus.ACTIVE)
+        val newArticles = context.newArticles
+        if (newArticles.isNotEmpty()) {
+            articleRepository.saveAll(newArticles)
+        }
         chain.next(context)
     }
 }
