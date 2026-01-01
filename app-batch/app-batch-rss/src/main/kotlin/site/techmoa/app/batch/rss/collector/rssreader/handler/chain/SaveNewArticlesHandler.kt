@@ -13,7 +13,7 @@ class SaveNewArticlesHandler(
 ) : RssCollectHandler {
 
     override fun getOrder(): Int {
-        return 100
+        return 4
     }
 
     @Transactional
