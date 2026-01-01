@@ -14,10 +14,6 @@ class CollectItemsByBlogHandler : RssCollectHandler {
     }
 
     override fun handle(context: RssCollectContext, chain: RssCollectHandlerChain) {
-        if (context.blogs.isEmpty()) {
-            return
-        }
-
         val rssReader = RssReader()
         context.collectedItems = context.blogs.associateWith { blog ->
             rssReader.read(blog.rssLink).toList()
