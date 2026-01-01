@@ -1,8 +1,7 @@
-package site.techmoa.app.batch.rss
+package site.techmoa.app.batch.rss.collector
 
 import com.apptasticsoftware.rssreader.Item
 import com.apptasticsoftware.rssreader.RssReader
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import site.techmoa.app.storage.db.entity.ArticleEntity
@@ -12,19 +11,13 @@ import site.techmoa.app.storage.db.repository.ArticleRepository
 import site.techmoa.app.storage.db.repository.BlogRepository
 
 @Component
-class RssCollector(
+class RssCollectorReader(
     val blogRepository: BlogRepository,
     val articleRepository: ArticleRepository,
-) {
+) : RssCollector {
 
-    companion object {
-        const val EVERY_30_MINUTES = "0 1/30 * * * *"
-        const val EVERY_MINUTE = "0 * * * * *"
-    }
-
-    @Scheduled(cron = EVERY_30_MINUTES)
     @Transactional
-    fun saveNewArticles() {
+    override fun execute() {
         // 1. 블로그마다 rssLink에서 아티클을 수집한다
         val blogs = loadActiveBlogs()
         val collectedItems = collectItemsByBlog(blogs)
@@ -59,7 +52,7 @@ class RssCollector(
         val link = item.link.orElse(null) ?: return null
         val guid = item.guid.orElse(null) ?: link
         val pubDate = parseToEpochMillis(item) ?: return null
-        return ArticleEntity.of(
+        return ArticleEntity.Companion.of(
             blogId = blogId,
             title = title,
             link = link,
