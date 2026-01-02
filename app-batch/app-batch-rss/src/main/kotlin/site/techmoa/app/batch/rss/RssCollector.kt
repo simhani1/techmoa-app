@@ -1,4 +1,4 @@
-package site.techmoa.app.batch.rss.collector
+package site.techmoa.app.batch.rss
 
 interface RssCollector {
     fun execute()
