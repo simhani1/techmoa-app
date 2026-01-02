@@ -1,32 +1,52 @@
-package site.techmoa.app.batch.rss.collector.rssreader.handler.chain
+package site.techmoa.app.batch.rss
 
 import com.apptasticsoftware.rssreader.Item
+import com.apptasticsoftware.rssreader.RssReader
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectContext
-import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectHandler
-import site.techmoa.app.batch.rss.collector.rssreader.handler.RssCollectHandlerChain
 import site.techmoa.app.storage.db.entity.ArticleEntity
 import site.techmoa.app.storage.db.entity.BlogEntity
+import site.techmoa.app.storage.db.entity.BlogStatus
 import site.techmoa.app.storage.db.repository.ArticleRepository
+import site.techmoa.app.storage.db.repository.BlogRepository
 
 @Component
-class FilterNewArticlesHandler(
+class RssReaderCollector(
     private val articleRepository: ArticleRepository,
-) : RssCollectHandler {
+    private val blogRepository: BlogRepository
+) : RssCollector {
 
-    override fun getOrder(): Int {
-        return 3
+    companion object {
+        private const val STANDARD_LINK_PREFIX: String = "https"
     }
+    private val log = LoggerFactory.getLogger(this.javaClass)
 
-    @Transactional(readOnly = true)
-    override fun handle(context: RssCollectContext, chain: RssCollectHandlerChain) {
+    @Transactional
+    override fun execute() {
+        // 1. 구독 블로그 조회
+        log.info("Set Blogs List")
+        val blogs = blogRepository.findAllStatus(status = BlogStatus.ACTIVE)
+
+        // 2. 각 블로그 RSS 수집
+        log.info("Start Collecting Articles")
+        val rssReader = RssReader()
+        val collectedItems = blogs.associateWith { blog ->
+            rssReader.read(blog.rssLink).toList()
+        }
+
+        // 3. 새로운 아티클 필터링
+        log.info("Filter New Articles")
         val newArticles = mutableListOf<ArticleEntity>()
-        for ((blog, items) in context.collectedItems) {
+        for ((blog, items) in collectedItems) {
             newArticles.addAll(filterNewArticles(items, blog))
         }
-        context.newArticles = newArticles
-        chain.next(context)
+
+        // 4. 새로운 아티클 저장
+        log.info("Save New Articles")
+        if (newArticles.isNotEmpty()) {
+            articleRepository.saveAll(newArticles)
+        }
     }
 
     private fun filterNewArticles(items: List<Item>, blog: BlogEntity): List<ArticleEntity> {
@@ -41,13 +61,23 @@ class FilterNewArticlesHandler(
         val link = item.link.orElse(null) ?: return null
         val guid = item.guid.orElse(null) ?: link
         val pubDate = parseToEpochMillis(item) ?: return null
-        return ArticleEntity.Companion.of(
+
+        val normalizedLink = normalizeLink(blog.link, link)
+
+        return ArticleEntity.of(
             blogId = blogId,
             title = title,
-            link = link,
+            link = normalizedLink,
             guid = guid,
             pubDate = pubDate
         )
+    }
+
+    private fun normalizeLink(blogLink: String, link: String): String {
+        if (link.startsWith(STANDARD_LINK_PREFIX)) {
+            return link
+        }
+        return blogLink + link
     }
 
     private fun parseToEpochMillis(item: Item): Long? {
