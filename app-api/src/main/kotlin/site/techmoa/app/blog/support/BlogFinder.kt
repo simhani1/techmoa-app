@@ -18,6 +18,6 @@ class BlogFinder(
 
     @Transactional(readOnly = true)
     fun findByIds(ids: List<Long>): List<Blog> {
-        return blogRepository.findAllById(ids).map { Blog(id = it.id, name = it.link) }
+        return blogRepository.findAllById(ids).map { Blog(id = it.id, name = it.name) }
     }
 }
