@@ -1,4 +1,4 @@
-package site.techmoa.domain.blog
+package site.techmoa.core.blog
 
 data class Blog(
     val id: Long,

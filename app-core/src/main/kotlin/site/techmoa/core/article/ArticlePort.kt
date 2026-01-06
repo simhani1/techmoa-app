@@ -1,4 +1,4 @@
-package site.techmoa.domain.article
+package site.techmoa.core.article
 
 interface ArticlePort {
     fun findById(id: Long): Article?

@@ -1,8 +1,8 @@
-package site.techmoa.domain.rss
+package site.techmoa.core.rss
 
-import site.techmoa.domain.article.Article
-import site.techmoa.domain.blog.Blog
-import site.techmoa.domain.blog.BlogStatus
+import site.techmoa.core.article.Article
+import site.techmoa.core.blog.Blog
+import site.techmoa.core.blog.BlogStatus
 
 interface RssFetchPort {
     fun saveAll(article: List<Article>)

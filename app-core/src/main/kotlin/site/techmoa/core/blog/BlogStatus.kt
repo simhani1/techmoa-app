@@ -1,4 +1,4 @@
-package site.techmoa.domain.blog
+package site.techmoa.core.blog
 
 enum class BlogStatus {
     ACTIVE,

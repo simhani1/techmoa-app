@@ -1,7 +1,7 @@
 package site.techmoa.app.storage.db.entity
 
 import jakarta.persistence.*
-import site.techmoa.domain.blog.BlogStatus
+import site.techmoa.core.blog.BlogStatus
 
 @Entity
 @Table(name = "blog")
