@@ -6,5 +6,9 @@ data class Article(
     val title: String,
     val link: String,
     val pubDate: Long,
-    val views: Int,
-)
+    var views: Int,
+) {
+    fun increaseViews(amount: Int = 1) {
+        views += amount
+    }
+}
