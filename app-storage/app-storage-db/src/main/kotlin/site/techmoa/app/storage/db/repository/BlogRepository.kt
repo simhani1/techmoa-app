@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import site.techmoa.app.storage.db.entity.BlogEntity
-import site.techmoa.app.storage.db.entity.BlogStatus
 
 interface BlogRepository : JpaRepository<BlogEntity, Long> {
 

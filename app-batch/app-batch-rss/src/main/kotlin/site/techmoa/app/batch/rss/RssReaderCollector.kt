@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import site.techmoa.app.storage.db.entity.ArticleEntity
 import site.techmoa.app.storage.db.entity.BlogEntity
-import site.techmoa.app.storage.db.entity.BlogStatus
 import site.techmoa.app.storage.db.repository.ArticleRepository
 import site.techmoa.app.storage.db.repository.BlogRepository
 
