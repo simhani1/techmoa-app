@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import site.techmoa.app.storage.db.entity.ArticleEntity
 
-interface ArticleRepository : JpaRepository<ArticleEntity, Long> {
+interface ArticleJpaRepository : JpaRepository<ArticleEntity, Long> {
     fun existsByBlogIdAndGuid(blogId: Long, guid: String): Boolean
 
     @Query(" select a from ArticleEntity a where (:cursor is null or a.pubDate < :cursor) order by a.pubDate desc")

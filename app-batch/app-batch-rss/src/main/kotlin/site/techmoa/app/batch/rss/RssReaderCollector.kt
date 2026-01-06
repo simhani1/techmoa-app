@@ -3,18 +3,18 @@ package site.techmoa.app.batch.rss
 import com.apptasticsoftware.rssreader.Item
 import com.apptasticsoftware.rssreader.RssReader
 import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter
-import org.slf4j.LoggerFactory
+import com.sun.org.slf4j.internal.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import site.techmoa.app.storage.db.entity.ArticleEntity
 import site.techmoa.app.storage.db.entity.BlogEntity
-import site.techmoa.app.storage.db.repository.ArticleRepository
-import site.techmoa.app.storage.db.repository.BlogRepository
+import site.techmoa.app.storage.db.repository.ArticleJpaRepository
+import site.techmoa.app.storage.db.repository.BlogJpaRepository
 
 @Component
 class RssReaderCollector(
-    private val articleRepository: ArticleRepository,
-    private val blogRepository: BlogRepository
+    private val articleRepository: ArticleJpaRepository,
+    private val blogRepository: BlogJpaRepository
 ) : RssCollector {
 
     companion object {

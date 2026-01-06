@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import site.techmoa.app.storage.db.entity.BlogEntity
 
-interface BlogRepository : JpaRepository<BlogEntity, Long> {
+interface BlogJpaRepository : JpaRepository<BlogEntity, Long> {
 
     @Query("select b from BlogEntity b where b._status = :status")
     fun findAllStatus(@Param("status") status: BlogStatus): List<BlogEntity>
