@@ -1,6 +1,6 @@
-package site.techmoa.core.article
+package site.techmoa.app.core.article
 
-import site.techmoa.core.common.OffsetLimit
+import site.techmoa.app.core.common.OffsetLimit
 
 interface ArticlePort {
     fun findById(id: Long): Article?

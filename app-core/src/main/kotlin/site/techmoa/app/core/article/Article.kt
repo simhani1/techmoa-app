@@ -1,4 +1,4 @@
-package site.techmoa.core.article
+package site.techmoa.app.core.article
 
 data class Article(
     val id: Long,

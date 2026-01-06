@@ -1,14 +1,15 @@
-package site.techmoa.core.article
+package site.techmoa.app.core.article
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.core.blog.BlogFinder
-import site.techmoa.core.common.OffsetLimit
-import site.techmoa.core.common.Page
+import site.techmoa.app.core.blog.BlogFinder
+import site.techmoa.app.core.common.OffsetLimit
+import site.techmoa.app.core.common.Page
 
 @Service
 class ArticleUseCase(
     private val articleFinder: ArticleFinder,
+    private val articleViewHandler: ArticleViewHandler,
     private val blogFinder: BlogFinder
 ){
     @Transactional(readOnly = true)
@@ -28,5 +29,10 @@ class ArticleUseCase(
             hasNext = hasNext,
             nextCursor = nextCursor
         )
+    }
+
+    @Transactional
+    fun increaseViewCount(articleId: Long) {
+        articleViewHandler.increaseViews(articleId)
     }
 }

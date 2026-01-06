@@ -1,4 +1,4 @@
-package site.techmoa.core.blog
+package site.techmoa.app.core.blog
 
 interface BlogPort {
     fun save(blog: Blog)

@@ -1,8 +1,8 @@
-package site.techmoa.core.article
+package site.techmoa.app.core.article
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.core.common.OffsetLimit
+import site.techmoa.app.core.common.OffsetLimit
 
 @Component
 class ArticleFinder(

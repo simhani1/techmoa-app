@@ -1,4 +1,4 @@
-package site.techmoa.core.blog
+package site.techmoa.app.core.blog
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
