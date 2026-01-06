@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":app-batch:app-batch-rss"))
-    implementation(project(":app-storage:app-storage-db"))
+    implementation(project(":app-core"))
+    runtimeOnly(project(":app-batch:app-batch-rss"))
 
 	implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

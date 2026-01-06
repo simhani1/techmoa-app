@@ -1,14 +1,14 @@
-package site.techmoa.app.article.controller
+package site.techmoa.app.article.controller.v1
 
 import org.springframework.web.bind.annotation.*
-import site.techmoa.app.article.domain.ArticleContent
-import site.techmoa.app.article.service.ArticleService
-import site.techmoa.app.core.Page
+import site.techmoa.app.core.article.ArticleContent
+import site.techmoa.app.core.article.ArticleUseCase
+import site.techmoa.app.core.common.Page
 import site.techmoa.app.core.response.ApiResponse
 
 @RestController
 class ArticleController(
-    private val articleService: ArticleService,
+    private val articleUseCase: ArticleUseCase,
 ) {
 
     companion object {
@@ -19,7 +19,7 @@ class ArticleController(
     fun getArticles(
         @RequestParam("cursor", required = false) cursor: Long?,
     ): ApiResponse<Page<ArticleContent>> {
-        val articles = articleService.getArticles(cursor, PAGE_LIMIT)
+        val articles = articleUseCase.getArticles(cursor, PAGE_LIMIT)
         return ApiResponse.success(articles)
     }
 
@@ -27,7 +27,7 @@ class ArticleController(
     fun increaseViewCount(
         @PathVariable articleId: Long
     ): ApiResponse<Any> {
-        articleService.increaseViewCount(articleId)
+        articleUseCase.increaseViewCount(articleId)
         return ApiResponse.success()
     }
 }

@@ -1,4 +1,4 @@
-package site.techmoa.app.core
+package site.techmoa.app.core.common
 
 data class Page<T>(
     val data: List<T>,
