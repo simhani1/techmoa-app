@@ -3,18 +3,19 @@ package site.techmoa.app.batch.rss
 import com.apptasticsoftware.rssreader.Item
 import com.apptasticsoftware.rssreader.RssReader
 import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter
-import com.sun.org.slf4j.internal.LoggerFactory
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.app.storage.db.entity.ArticleEntity
-import site.techmoa.app.storage.db.entity.BlogEntity
-import site.techmoa.app.storage.db.repository.ArticleJpaRepository
-import site.techmoa.app.storage.db.repository.BlogJpaRepository
+import site.techmoa.app.core.article.Article
+import site.techmoa.app.core.article.ArticlePort
+import site.techmoa.app.core.blog.Blog
+import site.techmoa.app.core.blog.BlogPort
+import site.techmoa.app.core.blog.BlogStatus
 
 @Component
 class RssReaderCollector(
-    private val articleRepository: ArticleJpaRepository,
-    private val blogRepository: BlogJpaRepository
+    private val articlePort: ArticlePort,
+    private val blogPort: BlogPort,
 ) : RssCollector {
 
     companion object {
@@ -26,19 +27,16 @@ class RssReaderCollector(
     override fun execute() {
         // 1. 구독 블로그 조회
         log.info("Set Blogs List")
-        val blogs = blogRepository.findAllStatus(status = BlogStatus.ACTIVE)
+        val blogs = blogPort.findAllBy(status = BlogStatus.ACTIVE)
 
         // 2. 각 블로그 RSS 수집
         log.info("Start Collecting Articles")
-        val rssReader = RssReader()
-        val collectedItems = blogs.associateWith { blog ->
-            rssReader.addFeedFilter(InvalidXmlCharacterFilter())
-                .read(blog.rssLink).toList()
-        }
+        val rssReader = RssReader().addFeedFilter(InvalidXmlCharacterFilter())
+        val collectedItems = blogs.associateWith { rssReader.read(it.rssLink).toList() }
 
         // 3. 새로운 아티클 필터링
         log.info("Filter New Articles")
-        val newArticles = mutableListOf<ArticleEntity>()
+        val newArticles = mutableListOf<Article>()
         for ((blog, items) in collectedItems) {
             newArticles.addAll(filterNewArticles(items, blog))
         }
@@ -46,17 +44,17 @@ class RssReaderCollector(
         // 4. 새로운 아티클 저장
         log.info("Save New Articles")
         if (newArticles.isNotEmpty()) {
-            articleRepository.saveAll(newArticles)
+            articlePort.saveAll(newArticles)
         }
     }
 
-    private fun filterNewArticles(items: List<Item>, blog: BlogEntity): List<ArticleEntity> {
-        val filtered = items.mapNotNull { item -> toArticle(blog, item) }
-            .filter { article -> isNewArticle(article) }
+    private fun filterNewArticles(items: List<Item>, blog: Blog): List<Article> {
+        val filtered = items.mapNotNull { toArticle(blog, it) }
+            .filter { isNewArticle(it) }
         return filtered
     }
 
-    private fun toArticle(blog: BlogEntity, item: Item): ArticleEntity? {
+    private fun toArticle(blog: Blog, item: Item): Article? {
         val blogId = blog.id
         val title = item.title.orElse(null) ?: return null
         val link = item.link.orElse(null) ?: return null
@@ -65,12 +63,12 @@ class RssReaderCollector(
 
         val normalizedLink = normalizeLink(blog.link, link)
 
-        return ArticleEntity.of(
+        return Article.of(
             blogId = blogId,
             title = title,
             link = normalizedLink,
             guid = guid,
-            pubDate = pubDate
+            pubDate = pubDate,
         )
     }
 
@@ -87,7 +85,7 @@ class RssReaderCollector(
             ?.toEpochMilli()
     }
 
-    private fun isNewArticle(articleEntity: ArticleEntity): Boolean {
-        return !articleRepository.existsByBlogIdAndGuid(articleEntity.blogId, articleEntity.guid)
+    private fun isNewArticle(article: Article): Boolean {
+        return !articlePort.existsByBlogIdAndGuid(article.blogId, article.guid)
     }
 }
