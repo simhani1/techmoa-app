@@ -2,6 +2,7 @@ package site.techmoa.app.batch.rss
 
 import com.apptasticsoftware.rssreader.Item
 import com.apptasticsoftware.rssreader.RssReader
+import com.apptasticsoftware.rssreader.filter.InvalidXmlCharacterFilter
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -32,7 +33,8 @@ class RssReaderCollector(
         log.info("Start Collecting Articles")
         val rssReader = RssReader()
         val collectedItems = blogs.associateWith { blog ->
-            rssReader.read(blog.rssLink).toList()
+            rssReader.addFeedFilter(InvalidXmlCharacterFilter())
+                .read(blog.rssLink).toList()
         }
 
         // 3. 새로운 아티클 필터링
