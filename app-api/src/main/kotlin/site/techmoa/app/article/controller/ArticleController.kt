@@ -1,8 +1,6 @@
 package site.techmoa.app.article.controller
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import site.techmoa.app.article.domain.ArticleContent
 import site.techmoa.app.article.service.ArticleService
 import site.techmoa.app.core.Page
@@ -23,5 +21,13 @@ class ArticleController(
     ): ApiResponse<Page<ArticleContent>> {
         val articles = articleService.getArticles(cursor, PAGE_LIMIT)
         return ApiResponse.success(articles)
+    }
+
+    @PostMapping("/v1/articles/{articleId}/views")
+    fun increaseViewCount(
+        @PathVariable articleId: Long
+    ): ApiResponse<Any> {
+        articleService.increaseViewCount(articleId)
+        return ApiResponse.success()
     }
 }
