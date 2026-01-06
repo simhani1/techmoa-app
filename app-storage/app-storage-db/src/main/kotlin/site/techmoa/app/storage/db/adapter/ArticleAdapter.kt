@@ -79,4 +79,8 @@ class ArticleAdapter(
         return articleRepository.existsByBlogIdAndGuid(blogId, guid)
     }
 
+    override fun increaseViews(id: Long): Int {
+        return articleRepository.increaseViews(id)
+    }
+
 }

@@ -8,10 +8,9 @@ class ArticleViewHandler(
     private val articlePort: ArticlePort
 ) {
     @Transactional
-    fun increaseViews(articleId: Long) {
-        val article = articlePort.findById(articleId)
-            ?: throw RuntimeException("Article with id $articleId not found")
-        article.increaseViews()
-        articlePort.save(article)
+    fun increaseViews(id: Long) {
+        if (articlePort.increaseViews(id) == 0) {
+            throw RuntimeException("Failed to increase views for article $id")
+        }
     }
 }
