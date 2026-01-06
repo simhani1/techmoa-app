@@ -5,6 +5,7 @@ data class Article(
     val blogId: Long,
     val title: String,
     val link: String,
+    val guid: String,
     val pubDate: Long,
     var views: Int,
 ) {
