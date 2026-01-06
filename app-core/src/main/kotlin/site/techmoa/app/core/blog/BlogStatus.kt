@@ -1,4 +1,4 @@
-package site.techmoa.app.storage.db.entity
+package site.techmoa.app.core.blog
 
 enum class BlogStatus {
     ACTIVE,
