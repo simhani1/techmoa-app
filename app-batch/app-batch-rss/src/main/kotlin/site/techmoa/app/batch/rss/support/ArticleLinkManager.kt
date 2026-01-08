@@ -1,4 +1,4 @@
-package site.techmoa.app.batch.rss
+package site.techmoa.app.batch.rss.support
 
 import org.springframework.stereotype.Component
 
@@ -10,7 +10,7 @@ class ArticleLinkManager {
         private const val HTTP: String = "http"
     }
 
-    fun normalize(blogLink: String, articleLink: String): String {
+    fun sanitizeLink(blogLink: String, articleLink: String): String {
         if (articleLink.startsWith(HTTPS)) {
             return articleLink
         }
