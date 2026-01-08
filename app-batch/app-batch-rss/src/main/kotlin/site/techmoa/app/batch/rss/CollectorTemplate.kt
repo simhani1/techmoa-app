@@ -1,5 +1,5 @@
 package site.techmoa.app.batch.rss
 
-interface RssCollector {
+interface CollectorTemplate {
     fun execute()
 }
