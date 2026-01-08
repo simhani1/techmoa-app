@@ -14,13 +14,11 @@ import site.techmoa.app.core.blog.BlogStatus
 
 @Component
 class RssReaderCollector(
+    private val articleLinkManager: ArticleLinkManager,
     private val articlePort: ArticlePort,
     private val blogPort: BlogPort,
 ) : RssCollector {
 
-    companion object {
-        private const val STANDARD_LINK_PREFIX: String = "https"
-    }
     private val log = LoggerFactory.getLogger(this.javaClass)
 
     @Transactional
@@ -61,7 +59,7 @@ class RssReaderCollector(
         val guid = item.guid.orElse(null) ?: link
         val pubDate = parseToEpochMillis(item) ?: return null
 
-        val normalizedLink = normalizeLink(blog.link, link)
+        val normalizedLink = articleLinkManager.normalize(blog.link, link)
 
         return Article.of(
             blogId = blogId,
@@ -70,13 +68,6 @@ class RssReaderCollector(
             guid = guid,
             pubDate = pubDate,
         )
-    }
-
-    private fun normalizeLink(blogLink: String, link: String): String {
-        if (link.startsWith(STANDARD_LINK_PREFIX)) {
-            return link
-        }
-        return blogLink + link
     }
 
     private fun parseToEpochMillis(item: Item): Long? {
