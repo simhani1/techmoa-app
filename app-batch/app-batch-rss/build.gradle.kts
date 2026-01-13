@@ -1,5 +1,6 @@
 dependencies {
     implementation(project(":app-core"))
+    testImplementation(testFixtures(project(":app-core")))
 
     // https://mvnrepository.com/artifact/com.apptasticsoftware/rssreader
     implementation("com.apptasticsoftware:rssreader:3.12.0")

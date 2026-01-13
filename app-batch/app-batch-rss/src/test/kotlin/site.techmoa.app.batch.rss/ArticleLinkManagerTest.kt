@@ -5,6 +5,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import site.techmoa.app.batch.rss.support.ArticleLinkManager
 
 @ExtendWith(MockKExtension::class)
 class ArticleLinkManagerTest {
@@ -20,7 +21,7 @@ class ArticleLinkManagerTest {
         val link = "https://example.com"
 
         // WHEN
-        val result = articleLinkManager.normalize(blogLink, link)
+        val result = articleLinkManager.sanitizeLink(blogLink, link)
 
         // THEN
         result.shouldBe(link)
@@ -34,7 +35,7 @@ class ArticleLinkManagerTest {
         val link = "http://example.com"
 
         // WHEN
-        val result = articleLinkManager.normalize(blogLink, link)
+        val result = articleLinkManager.sanitizeLink(blogLink, link)
 
         // THEN
         result.shouldBe(link)
@@ -48,7 +49,7 @@ class ArticleLinkManagerTest {
         val link = "/post/1"
 
         // WHEN
-        val result = articleLinkManager.normalize(blogLink, link)
+        val result = articleLinkManager.sanitizeLink(blogLink, link)
 
         // THEN
         result.shouldBe(blogLink + link)
