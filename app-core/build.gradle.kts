@@ -1,3 +1,5 @@
+apply(plugin = "java-test-fixtures")
+
 dependencies {
     runtimeOnly(project(":app-storage:app-storage-db"))
 
