@@ -1,6 +1,10 @@
 dependencies {
     implementation(project(":app-core"))
-    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    compileOnly("org.springframework:spring-web")
+    compileOnly("org.springframework:spring-context")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:1.1.15")
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
