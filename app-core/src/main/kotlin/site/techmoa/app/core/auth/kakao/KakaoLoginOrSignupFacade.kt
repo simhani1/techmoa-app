@@ -1,6 +1,8 @@
-package site.techmoa.app.core.member
+package site.techmoa.app.core.auth.kakao
 
 import org.springframework.stereotype.Service
+import site.techmoa.app.core.auth.kakao.dto.JwtToken
+import site.techmoa.app.core.auth.kakao.port.KakaoOidcClient
 
 @Service
 class KakaoLoginOrSignupFacade(

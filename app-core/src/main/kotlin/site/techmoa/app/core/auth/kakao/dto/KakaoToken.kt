@@ -1,4 +1,4 @@
-package site.techmoa.app.core.member
+package site.techmoa.app.core.auth.kakao.dto
 
 data class KakaoToken(
     val idToken: String,

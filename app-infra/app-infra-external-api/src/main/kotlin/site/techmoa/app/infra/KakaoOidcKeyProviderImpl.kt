@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import site.techmoa.app.core.member.KakaoOidcKeyProvider
+import site.techmoa.app.core.auth.kakao.KakaoOidcKeyProvider
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.spec.RSAPublicKeySpec
-import java.util.Base64
+import java.util.*
 
 @Component
 class KakaoOidcKeyProviderImpl(

@@ -1,4 +1,4 @@
-package site.techmoa.app.core.member
+package site.techmoa.app.core.auth.kakao
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -8,7 +8,7 @@ import java.security.PublicKey
 import java.security.Signature
 import java.time.Clock
 import java.time.Instant
-import java.util.Base64
+import java.util.*
 
 @Component
 class KakaoIdTokenValidator(

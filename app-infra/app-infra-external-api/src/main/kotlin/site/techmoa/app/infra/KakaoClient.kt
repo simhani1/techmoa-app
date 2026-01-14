@@ -6,8 +6,8 @@ import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import site.techmoa.app.core.member.KakaoOidcClient
-import site.techmoa.app.core.member.KakaoToken
+import site.techmoa.app.core.auth.kakao.dto.KakaoToken
+import site.techmoa.app.core.auth.kakao.port.KakaoOidcClient
 import site.techmoa.app.infra.exception.KakaoClientException
 import site.techmoa.app.infra.exception.KakaoServerException
 
