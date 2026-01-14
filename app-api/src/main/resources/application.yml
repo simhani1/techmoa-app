@@ -5,25 +5,12 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/techmoa?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
-    username: root
-    password: root
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-    open-in-view: false
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
+  profiles:
+    include:
+      - infra-external-api
+    group:
+      local: local, infra-db-local
+      prod: prod, infra-db-prod
 
 management:
   endpoints:

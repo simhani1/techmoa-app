@@ -24,3 +24,9 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql: trace
+
+oauth:
+  kakao:
+    client-id: dummy
+    client-secret: dummy
+    redirect-uri: dummy
