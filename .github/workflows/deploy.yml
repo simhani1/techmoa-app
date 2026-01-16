@@ -67,9 +67,13 @@ jobs:
             DB_URL=${{ secrets.DB_URL }}
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            KAKAO_BASE_URL=${{ secrets.KAKAO_BASE_URL }}
             KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
             KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
             KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
+            JWT_ISSUER=${{ secrets.JWT_ISSUER }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_ATK_EXPIRATION_SECONDS=${{ secrets.JWT_ATK_EXPIRATION_SECONDS }}
 
   deploy:
     needs: build
@@ -95,9 +99,13 @@ jobs:
             -e DB_URL=${{ secrets.DB_URL }} \
             -e DB_USER=${{ secrets.DB_USER }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e KAKAO_BASE_URL=${{ secrets.KAKAO_BASE_URL }} \
             -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
             -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
             -e KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }} \
+            -e JWT_ISSUER=${{ secrets.JWT_ISSUER }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e JWT_ATK_EXPIRATION_SECONDS=${{ secrets.JWT_ATK_EXPIRATION_SECONDS }} \
             $IMAGE
 
   discord-notification:
