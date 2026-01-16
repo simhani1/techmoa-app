@@ -1,0 +1,9 @@
+package site.techmoa.app.infra.oauth.config
+
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.context.annotation.Configuration
+
+@Configuration
+@ConfigurationPropertiesScan
+class PropertiesConfig {
+}

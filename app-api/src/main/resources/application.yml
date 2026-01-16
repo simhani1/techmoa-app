@@ -7,7 +7,7 @@ spring:
 
   profiles:
     include:
-      - infra-external-api
+      - infra-oauth
     group:
       local: local, infra-db-local
       prod: prod, infra-db-prod

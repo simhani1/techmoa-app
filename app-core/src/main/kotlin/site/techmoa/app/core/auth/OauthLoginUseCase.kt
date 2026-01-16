@@ -1,0 +1,18 @@
+package site.techmoa.app.core.auth
+
+import org.springframework.stereotype.Service
+import site.techmoa.app.core.auth.dto.AuthToken
+import site.techmoa.app.core.auth.port.ExternalAuthProvider
+import site.techmoa.app.core.member.MemberUseCase
+
+@Service
+class OauthLoginUseCase(
+    private val externalAuthProvider: ExternalAuthProvider,
+    private val memberUseCase: MemberUseCase
+) {
+    fun process(code: String): AuthToken {
+        val user = externalAuthProvider.authenticate(code)
+        memberUseCase.findOrCreate(user)
+        return AuthToken("ff")
+    }
+}
