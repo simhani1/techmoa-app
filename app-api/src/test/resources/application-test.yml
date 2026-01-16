@@ -30,3 +30,8 @@ oauth:
     client-id: dummy
     client-secret: dummy
     redirect-uri: dummy
+
+jwt:
+  issuer: dummy
+  secret: dummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummy
+  atk-expiration-seconds: 10

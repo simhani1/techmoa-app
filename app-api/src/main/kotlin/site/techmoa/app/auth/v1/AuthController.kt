@@ -16,7 +16,7 @@ class AuthController(
     fun kakaoAuthorization(
         @RequestParam("code") code: String,
     ): ApiResponse<LoginResponse> {
-        val jwtToken = oauthLoginUseCase.process(code)
-        return ApiResponse.success(LoginResponse(jwtToken.accessToken))
+        val token = oauthLoginUseCase.process(code)
+        return ApiResponse.success(LoginResponse(token.accessToken))
     }
 }

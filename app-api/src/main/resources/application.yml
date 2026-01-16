@@ -9,8 +9,14 @@ spring:
     include:
       - infra-oauth
     group:
-      local: local, infra-db-local
-      prod: prod, infra-db-prod
+      local:
+        - local
+        - infra-db-local
+        - infra-jwt-local
+      prod:
+        - prod
+        - infra-db-prod
+        - infra-jwt-prod
 
 management:
   endpoints:
