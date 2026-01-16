@@ -6,6 +6,7 @@ import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldNotBeBlank
+import site.techmoa.app.core.auth.OauthProvider
 
 class MemberEntityTest: DescribeSpec({
 
@@ -17,15 +18,15 @@ class MemberEntityTest: DescribeSpec({
         context("카카오로 가입하면") {
 
             val member = fixtureMonkey.giveMeBuilder<MemberEntity>()
-                .set("provider", MemberEntity.OAuthProvider.KAKAO)
+                .set("provider", OauthProvider.KAKAO)
                 .set("providerUserId", "kakao_12345")
                 .sample()
 
             it("provider는 KAKAO다") {
-                member.provider.shouldBe(MemberEntity.OAuthProvider.KAKAO)
+                member.provider.shouldBe(OauthProvider.KAKAO)
             }
-            it("providerUserId는 필수다") {
-                member.providerUserId.shouldNotBeBlank()
+            it("subject는 필수다") {
+                member.subject.shouldNotBeBlank()
             }
         }
     }

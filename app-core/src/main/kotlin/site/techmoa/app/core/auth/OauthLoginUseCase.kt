@@ -8,11 +8,11 @@ import site.techmoa.app.core.member.MemberUseCase
 @Service
 class OauthLoginUseCase(
     private val externalAuthProvider: ExternalAuthProvider,
-    private val memberUseCase: MemberUseCase
+    private val memberUseCase: MemberUseCase,
 ) {
     fun process(code: String): AuthToken {
-        val user = externalAuthProvider.authenticate(code)
-        memberUseCase.findOrCreate(user)
-        return AuthToken("ff")
+        val memberResource = externalAuthProvider.getMemberResource(code)
+        val member = memberUseCase.findOrCreate(memberResource)
+        return AuthToken("dd")
     }
 }
