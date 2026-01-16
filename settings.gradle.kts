@@ -1,7 +1,13 @@
 rootProject.name = "app"
 
 include("app-api")
-include("app-batch:app-batch-rss")
-include("app-storage")
-include("app-storage:app-storage-db")
+
 include("app-core")
+
+include("app-batch:app-batch-rss")
+
+include("app-infra")
+include("app-infra:app-infra-db")
+include("app-infra:app-infra-oauth")
+include("app-infra:app-infra-jwt")
+include("app-infra:app-infra-jwt")

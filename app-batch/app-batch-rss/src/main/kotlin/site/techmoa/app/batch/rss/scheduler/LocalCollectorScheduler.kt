@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 import site.techmoa.app.batch.rss.CollectorTemplate
 
 @Component
-@Profile("default")
+@Profile("local")
 class LocalCollectorScheduler(
     private val collector: CollectorTemplate
 ) {

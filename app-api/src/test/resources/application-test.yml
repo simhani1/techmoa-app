@@ -24,3 +24,14 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql: trace
+
+oauth:
+  kakao:
+    client-id: dummy
+    client-secret: dummy
+    redirect-uri: dummy
+
+jwt:
+  issuer: dummy
+  secret: dummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummy
+  atk-expiration-seconds: 10
