@@ -1,6 +1,10 @@
 package site.techmoa.app.infra.oauth
 
-import io.jsonwebtoken.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.Jws
+import io.jsonwebtoken.Jwts
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import site.techmoa.app.infra.jwt.InvalidTokenException
@@ -21,34 +25,35 @@ class JwtOIDCProvider {
     }
 
     private val log = LoggerFactory.getLogger(this.javaClass)
+    private val objectMapper = ObjectMapper()
 
     fun getKidFromUnsignedTokenHeader(token: String, iss: String, aud: String): String {
-        return getUnsignedTokenClaims(token, iss, aud).header[KID] as String
-    }
-
-    private fun getUnsignedTokenClaims(token: String, iss: String, aud: String): Jwt<Header, Claims> {
+        log.info("[JWT] Extracting kid from unsigned token header - token length: ${token.length}, expected issuer: $iss, expected audience: $aud")
         try {
-            return Jwts.parser()
-                .requireIssuer(iss)
-                .requireAudience(aud)
-                .build()
-                .parseUnsecuredClaims(getUnsignedToken(token))
-        } catch (e: ExpiredJwtException) {
-            throw RuntimeException("mma")
+            val splitToken = token.split('.')
+            log.info("[JWT] Splitting token - parts: ${splitToken.size}")
+            if (splitToken.size != 3) {
+                log.error("[JWT] Invalid token format - expected 3 parts, got ${splitToken.size}")
+                throw InvalidTokenException("Invalid idToken format: expected 3 parts, got ${splitToken.size}")
+            }
+            val headerJson = String(Base64.getUrlDecoder().decode(splitToken[0]))
+            val kid = objectMapper.readTree(headerJson).path(KID).asText()
+            if (kid.isBlank()) {
+                log.error("[JWT] Missing kid in token header")
+                throw InvalidTokenException("Invalid idToken format: missing kid in token header")
+            }
+            log.info("[JWT] kid extracted from token header")
+            return kid
         } catch (e: Exception) {
-            log.error(e.toString());
-            throw RuntimeException()
+            log.error("[JWT] Failed to extract kid from token header", e)
+            throw RuntimeException("Failed to extract kid: ${e.message}")
         }
     }
 
-    private fun getUnsignedToken(token: String): String {
-        val splitToken = token.split("\\.")
-        if (splitToken.size != 3) throw InvalidTokenException("Invalid idToken format: $token")
-        return splitToken[0] + "." + splitToken[1] + "."
-    }
-
     fun getPayload(token: String, n: String, e: String): OIDCPayload {
+        log.info("[JWT] Extracting payload from signed token - token length: ${token.length}")
         val payload = getTokenJws(token, n, e).payload
+        log.info("[JWT] Payload extracted successfully - issuer: ${payload.issuer}, audience: ${payload.audience}, subject: ${payload.subject}, email: ${payload[EMAIL]}")
         return OIDCPayload(
             issuer = payload.issuer,
             audience = payload.audience.toString(),
