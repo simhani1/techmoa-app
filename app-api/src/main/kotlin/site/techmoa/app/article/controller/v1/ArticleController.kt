@@ -1,5 +1,6 @@
 package site.techmoa.app.article.controller.v1
 
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import site.techmoa.app.core.article.ArticleContent
 import site.techmoa.app.core.article.ArticleUseCase
@@ -18,16 +19,16 @@ class ArticleController(
     @GetMapping("/v1/articles")
     fun getArticles(
         @RequestParam("cursor", required = false) cursor: Long?,
-    ): ApiResponse<Page<ArticleContent>> {
+    ): ResponseEntity<ApiResponse<Page<ArticleContent>>> {
         val articles = articleUseCase.getArticles(cursor, PAGE_LIMIT)
-        return ApiResponse.success(articles)
+        return ResponseEntity.ok(ApiResponse.success(articles))
     }
 
     @PostMapping("/v1/articles/{articleId}/views")
     fun increaseViewCount(
         @PathVariable articleId: Long
-    ): ApiResponse<Any> {
+    ): ResponseEntity<ApiResponse<Any>> {
         articleUseCase.increaseViewCount(articleId)
-        return ApiResponse.success()
+        return ResponseEntity.ok(ApiResponse.success())
     }
 }
