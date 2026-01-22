@@ -1,7 +1,7 @@
 package site.techmoa.app.storage.db.entity
 
 import jakarta.persistence.*
-import site.techmoa.app.core.auth.OauthProvider
+import site.techmoa.app.common.auth.OauthProvider
 
 @Entity
 @Table(

@@ -1,6 +1,5 @@
 dependencies {
     implementation(project(":app-core"))
-    implementation(project(":app-infra:app-infra-jwt"))
 
     compileOnly("org.springframework.boot:spring-boot")
     compileOnly("org.springframework:spring-web")

@@ -6,7 +6,7 @@ import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.instantiator.instantiateBy
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import site.techmoa.app.core.blog.BlogStatus
+import site.techmoa.app.common.blog.BlogStatus
 
 class BlogEntityTest : DescribeSpec({
 

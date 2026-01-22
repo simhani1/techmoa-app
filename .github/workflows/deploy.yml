@@ -67,6 +67,9 @@ jobs:
             DB_URL=${{ secrets.DB_URL }}
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            CORS_ORIGIN_LOCAL=${{ secrets.CORS_ORIGIN_LOCAL }}
+            CORS_ORIGIN_DEV=${{ secrets.CORS_ORIGIN_DEV }}
+            CORS_ORIGIN_PROD=${{ secrets.CORS_ORIGIN_PROD }}
             KAKAO_BASE_URL=${{ secrets.KAKAO_BASE_URL }}
             KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
             KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
@@ -99,6 +102,9 @@ jobs:
             -e DB_URL=${{ secrets.DB_URL }} \
             -e DB_USER=${{ secrets.DB_USER }} \
             -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e CORS_ORIGIN_LOCAL=${{ secrets.CORS_ORIGIN_LOCAL }} \
+            -e CORS_ORIGIN_DEV=${{ secrets.CORS_ORIGIN_DEV }} \
+            -e CORS_ORIGIN_PROD=${{ secrets.CORS_ORIGIN_PROD }} \
             -e KAKAO_BASE_URL=${{ secrets.KAKAO_BASE_URL }} \
             -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
             -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \

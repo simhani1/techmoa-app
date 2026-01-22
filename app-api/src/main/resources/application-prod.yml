@@ -1,3 +1,7 @@
+cors:
+  allowed-origins:
+    - ${CORS_ORIGIN_PROD}
+
 logging:
   level:
     root: info

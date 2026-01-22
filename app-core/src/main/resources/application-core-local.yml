@@ -1,0 +1,9 @@
+jwt:
+  issuer: dummy
+  secret: dummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummy
+  atk-expiration-seconds: 3600
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
