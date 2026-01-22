@@ -1,4 +1,0 @@
-jwt:
-  issuer: dummy
-  secret: dummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummydummy
-  atk-expiration-seconds: 3600

@@ -1,4 +1,0 @@
-jwt:
-  issuer: ${JWT_ISSUER}
-  secret: ${JWT_SECRET}
-  atk-expiration-seconds: ${JWT_ATK_EXPIRATION_SECONDS}
