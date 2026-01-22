@@ -1,7 +1,6 @@
 package site.techmoa.app.core.article
 
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import site.techmoa.app.core.blog.BlogFinder
 import site.techmoa.app.core.common.OffsetLimit
 import site.techmoa.app.core.common.Page
@@ -11,8 +10,7 @@ class ArticleUseCase(
     private val articleFinder: ArticleFinder,
     private val articleViewHandler: ArticleViewHandler,
     private val blogFinder: BlogFinder
-){
-    @Transactional(readOnly = true)
+) {
     fun getArticles(cursor: Long?, limit: Int): Page<ArticleContent> {
         val fetchArticles = articleFinder.findPublishedAfter(cursor, OffsetLimit(limit = limit))
         val articles = fetchArticles.take(limit)
@@ -31,8 +29,11 @@ class ArticleUseCase(
         )
     }
 
-    @Transactional
     fun increaseViewCount(articleId: Long) {
         articleViewHandler.increaseViews(articleId)
+    }
+
+    fun getArticle(articleId: Long): Article {
+        return articleFinder.findByIdOrNull(articleId)
     }
 }

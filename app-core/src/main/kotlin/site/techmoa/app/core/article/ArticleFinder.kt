@@ -12,4 +12,9 @@ class ArticleFinder(
     fun findPublishedAfter(cursor: Long?, offsetLimit: OffsetLimit): List<Article> {
         return articlePort.findPublishedAfter(cursor, offsetLimit)
     }
+
+    @Transactional(readOnly = true)
+    fun findByIdOrNull(articleId: Long): Article {
+        return articlePort.findById(articleId) ?: throw RuntimeException("Article not found with id: $articleId")
+    }
 }
