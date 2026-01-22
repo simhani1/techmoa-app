@@ -1,3 +1,8 @@
+cors:
+  allowed-origins:
+    - ${CORS_ORIGIN_LOCAL}
+    - ${CORS_ORIGIN_DEV}
+
 logging:
   level:
     org.hibernate.SQL: debug

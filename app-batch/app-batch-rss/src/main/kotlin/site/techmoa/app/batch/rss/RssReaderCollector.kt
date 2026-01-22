@@ -3,10 +3,10 @@ package site.techmoa.app.batch.rss
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.app.core.article.Article
-import site.techmoa.app.core.article.ArticlePort
-import site.techmoa.app.core.blog.BlogPort
-import site.techmoa.app.core.blog.BlogStatus
+import site.techmoa.app.common.article.Article
+import site.techmoa.app.common.article.ArticlePort
+import site.techmoa.app.common.blog.BlogPort
+import site.techmoa.app.common.blog.BlogStatus
 
 @Component
 class RssReaderCollector(

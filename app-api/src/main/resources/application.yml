@@ -11,15 +11,15 @@ spring:
     group:
       local:
         - local
+        - core-local
         - infra-db-local
-        - infra-jwt-local
       prod:
         - prod
+        - core-prod
         - infra-db-prod
-        - infra-jwt-prod
 
 management:
   endpoints:
     web:
       exposure:
-        include: prometheus, health
+        include: prometheus, heal
