@@ -6,7 +6,7 @@ import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldNotBeBlank
-import site.techmoa.app.common.auth.OauthProvider
+import site.techmoa.app.core.auth.OauthProvider
 
 class MemberEntityTest: DescribeSpec({
 

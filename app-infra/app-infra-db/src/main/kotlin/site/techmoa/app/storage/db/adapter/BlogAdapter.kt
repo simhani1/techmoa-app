@@ -1,9 +1,9 @@
 package site.techmoa.app.storage.db.adapter
 
 import org.springframework.stereotype.Repository
-import site.techmoa.app.common.blog.Blog
-import site.techmoa.app.common.blog.BlogPort
-import site.techmoa.app.common.blog.BlogStatus
+import site.techmoa.app.core.blog.Blog
+import site.techmoa.app.core.blog.BlogPort
+import site.techmoa.app.core.blog.BlogStatus
 import site.techmoa.app.storage.db.entity.BlogEntity
 import site.techmoa.app.storage.db.repository.BlogJpaRepository
 

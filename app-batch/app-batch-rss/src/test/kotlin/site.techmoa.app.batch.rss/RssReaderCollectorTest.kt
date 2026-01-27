@@ -9,10 +9,10 @@ import io.mockk.just
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import site.techmoa.app.common.article.port.ArticlePort
-import site.techmoa.app.common.blog.BlogPort
-import site.techmoa.app.common.blog.BlogStatus
-import site.techmoa.app.common.comb.BlogAndArticleFixture
+import site.techmoa.app.core.article.port.ArticlePort
+import site.techmoa.app.core.blog.BlogPort
+import site.techmoa.app.core.blog.BlogStatus
+import site.techmoa.app.core.comb.BlogAndArticleFixture
 
 @ExtendWith(MockKExtension::class)
 class RssReaderCollectorTest {

@@ -10,10 +10,10 @@ import org.springframework.http.HttpHeaders
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
-import site.techmoa.app.common.auth.OauthLoginUseCase
-import site.techmoa.app.common.auth.dto.AuthToken
-import site.techmoa.app.common.config.WebConfig
-import site.techmoa.app.common.interceptor.JwtInterceptor
+import site.techmoa.app.core.auth.OauthLoginUseCase
+import site.techmoa.app.core.auth.dto.AuthToken
+import site.techmoa.app.core.config.WebConfig
+import site.techmoa.app.core.interceptor.JwtInterceptor
 
 @WebMvcTest(
     controllers = [AuthController::class],

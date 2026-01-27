@@ -5,10 +5,10 @@ import org.springframework.http.client.ClientHttpResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import site.techmoa.app.common.auth.dto.KakaoToken
-import site.techmoa.app.common.auth.dto.OIDCPubKeyDto
-import site.techmoa.app.common.auth.dto.OIDCPubKeys
-import site.techmoa.app.common.auth.oidc.OauthProperties
+import site.techmoa.app.core.auth.dto.KakaoToken
+import site.techmoa.app.core.auth.dto.OIDCPubKeyDto
+import site.techmoa.app.core.auth.dto.OIDCPubKeys
+import site.techmoa.app.core.auth.oidc.OauthProperties
 import site.techmoa.app.infra.oauth.exception.KakaoClientException
 import site.techmoa.app.infra.oauth.exception.KakaoServerException
 

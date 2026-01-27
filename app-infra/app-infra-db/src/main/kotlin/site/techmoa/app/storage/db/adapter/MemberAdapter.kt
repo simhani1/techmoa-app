@@ -1,11 +1,11 @@
 package site.techmoa.app.storage.db.adapter
 
 import org.springframework.stereotype.Repository
-import site.techmoa.app.common.auth.OauthProvider
-import site.techmoa.app.common.auth.dto.MemberResource
-import site.techmoa.app.common.member.domain.Member
-import site.techmoa.app.common.member.domain.MemberLookupResult
-import site.techmoa.app.common.member.port.MemberPort
+import site.techmoa.app.core.auth.OauthProvider
+import site.techmoa.app.core.auth.dto.MemberResource
+import site.techmoa.app.core.member.domain.Member
+import site.techmoa.app.core.member.domain.MemberLookupResult
+import site.techmoa.app.core.member.port.MemberPort
 import site.techmoa.app.storage.db.entity.MemberEntity
 import site.techmoa.app.storage.db.repository.MemberRepository
 

@@ -2,10 +2,10 @@ package site.techmoa.app.infra.oauth.kakao
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import site.techmoa.app.common.auth.OauthProvider
-import site.techmoa.app.common.auth.dto.MemberResource
-import site.techmoa.app.common.auth.oidc.OIDCHelper
-import site.techmoa.app.common.auth.port.ExternalAuthProvider
+import site.techmoa.app.core.auth.OauthProvider
+import site.techmoa.app.core.auth.dto.MemberResource
+import site.techmoa.app.core.auth.oidc.OIDCHelper
+import site.techmoa.app.core.auth.port.ExternalAuthProvider
 
 @Component
 class KakaoAuthProvider(

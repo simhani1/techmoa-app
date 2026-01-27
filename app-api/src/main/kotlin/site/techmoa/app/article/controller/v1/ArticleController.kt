@@ -3,11 +3,11 @@ package site.techmoa.app.article.controller.v1
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import site.techmoa.app.article.controller.v1.response.GetArticleResponse
-import site.techmoa.app.common.annotation.AuthOptional
-import site.techmoa.app.common.article.ArticleUseCase
-import site.techmoa.app.common.article.domain.ArticleContent
-import site.techmoa.app.common.common.Page
-import site.techmoa.app.common.response.ApiResponse
+import site.techmoa.app.core.annotation.AuthOptional
+import site.techmoa.app.core.article.ArticleUseCase
+import site.techmoa.app.core.article.domain.ArticleContent
+import site.techmoa.app.core.common.Page
+import site.techmoa.app.core.response.ApiResponse
 
 @RestController
 class ArticleController(
