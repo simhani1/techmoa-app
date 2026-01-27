@@ -1,6 +1,7 @@
 cors:
   allowed-origins:
     - ${CORS_ORIGIN_PROD}
+    - ${CORS_ORIGIN_DEV}
 
 logging:
   level:
