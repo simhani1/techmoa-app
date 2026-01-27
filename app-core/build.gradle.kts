@@ -1,7 +1,7 @@
 apply(plugin = "java-test-fixtures")
 
 dependencies {
-    runtimeOnly(project(":app-infra:app-infra-db"))
+    api(project(":app-infra:app-infra-db"))
     runtimeOnly(project(":app-infra:app-infra-oauth"))
 
     // Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt

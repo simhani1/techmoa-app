@@ -1,7 +1,8 @@
 package site.techmoa.app.core.bookmark.domain
 
 class BookmarkedArticle(
-    val articleId: Long,
-    val bookmarkedAt: Long = System.currentTimeMillis()
+    val id: Long,
+    val bookmarkedAt: Long,
+    val status: BookmarkStatus
 ) {
 }

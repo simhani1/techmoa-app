@@ -1,11 +1,11 @@
 package site.techmoa.app.core.bookmark.port
 
-import site.techmoa.app.core.bookmark.domain.Bookmark
+import site.techmoa.app.core.article.domain.Article
 import site.techmoa.app.core.bookmark.domain.BookmarkedArticle
 import site.techmoa.app.core.member.domain.Member
 
 interface BookmarkPort {
-    fun findBy(member: Member): Bookmark
-    fun save(article: BookmarkedArticle)
-    fun remove(bookmark: Bookmark)
+    fun findBy(memberId: Long): BookmarkedArticle?
+    fun save()
+    fun remove(member: Member, article: Article)
 }

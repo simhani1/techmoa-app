@@ -14,6 +14,6 @@ class BookmarkedArticleEntity(
 
     @CreationTimestamp
     @Column(name = "bookmarked_at", nullable = false)
-    var bookmarkedAt: Long
+    var bookmarkedAt: Long = System.currentTimeMillis(),
 ) : BaseEntity() {
 }
