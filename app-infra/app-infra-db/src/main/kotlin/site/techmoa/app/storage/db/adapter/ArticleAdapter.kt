@@ -3,8 +3,8 @@ package site.techmoa.app.storage.db.adapter
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
-import site.techmoa.app.common.article.Article
-import site.techmoa.app.common.article.ArticlePort
+import site.techmoa.app.common.article.domain.Article
+import site.techmoa.app.common.article.port.ArticlePort
 import site.techmoa.app.common.common.OffsetLimit
 import site.techmoa.app.storage.db.entity.ArticleEntity
 import site.techmoa.app.storage.db.repository.ArticleJpaRepository

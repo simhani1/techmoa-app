@@ -4,7 +4,7 @@ import com.apptasticsoftware.rssreader.Item
 import org.springframework.stereotype.Component
 import site.techmoa.app.batch.rss.ParsedItem
 import site.techmoa.app.batch.rss.RssClient
-import site.techmoa.app.common.article.Article
+import site.techmoa.app.common.article.domain.Article
 import site.techmoa.app.common.blog.Blog
 import java.time.ZonedDateTime
 

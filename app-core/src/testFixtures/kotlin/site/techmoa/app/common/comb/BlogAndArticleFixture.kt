@@ -1,7 +1,7 @@
 package site.techmoa.app.common.comb
 
-import site.techmoa.app.common.article.Article
 import site.techmoa.app.common.article.ArticleFixture
+import site.techmoa.app.common.article.domain.Article
 import site.techmoa.app.common.blog.Blog
 import site.techmoa.app.common.blog.BlogFixture
 

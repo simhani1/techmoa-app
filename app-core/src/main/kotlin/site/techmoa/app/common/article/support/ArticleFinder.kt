@@ -1,7 +1,9 @@
-package site.techmoa.app.common.article
+package site.techmoa.app.common.article.support
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import site.techmoa.app.common.article.domain.Article
+import site.techmoa.app.common.article.port.ArticlePort
 import site.techmoa.app.common.common.OffsetLimit
 
 @Component

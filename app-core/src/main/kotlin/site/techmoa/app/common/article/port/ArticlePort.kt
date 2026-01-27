@@ -1,5 +1,6 @@
-package site.techmoa.app.common.article
+package site.techmoa.app.common.article.port
 
+import site.techmoa.app.common.article.domain.Article
 import site.techmoa.app.common.common.OffsetLimit
 
 interface ArticlePort {

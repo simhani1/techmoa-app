@@ -1,4 +1,4 @@
-package site.techmoa.app.common.article
+package site.techmoa.app.common.article.domain
 
 data class Article(
     val id: Long,

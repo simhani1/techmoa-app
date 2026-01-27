@@ -1,5 +1,7 @@
 package site.techmoa.app.common.article
 
+import site.techmoa.app.common.article.domain.Article
+
 class ArticleFixture {
 
     companion object {
