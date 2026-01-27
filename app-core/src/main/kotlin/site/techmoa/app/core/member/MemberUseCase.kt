@@ -9,7 +9,7 @@ import site.techmoa.app.core.member.port.MemberPort
 
 @Service
 class MemberUseCase(
-    private val memberPort: MemberPort
+    private val memberPort: MemberPort,
 ) {
     @Transactional
     fun findOrCreate(resource: MemberResource): Member {

@@ -1,6 +1,9 @@
 package site.techmoa.app.core.bookmark.domain
 
+import site.techmoa.app.core.member.domain.Member
+
 class Bookmark(
+    private val member: Member,
     private val articles: MutableSet<BookmarkedArticle> = mutableSetOf()
 ) {
     fun add(articleId: Long) {
