@@ -11,7 +11,7 @@ class LocalCollectorScheduler(
     private val collector: CollectorTemplate
 ) {
     companion object {
-        const val EVERY_MINUTE = "0 * * * * *"
+        const val EVERY_MINUTE = "0 0 * * * *"
     }
     @Scheduled(cron = EVERY_MINUTE)
     fun run() {
