@@ -3,7 +3,6 @@ package site.techmoa.app.batch.rss
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.app.common.article.Article
 import site.techmoa.app.common.article.ArticlePort
 import site.techmoa.app.common.blog.BlogPort
 import site.techmoa.app.common.blog.BlogStatus
@@ -36,7 +35,7 @@ class RssReaderCollector(
         articlePort.saveAll(newArticles)
     }
 
-    private fun isNewArticle(article: Article): Boolean {
+    private fun isNewArticle(article: site.techmoa.app.common.article.Article): Boolean {
         return !articlePort.existsByBlogIdAndGuid(article.blogId, article.guid)
     }
 }

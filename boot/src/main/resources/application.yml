@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: app
+
+  config:
+    import: optional:file:.env[.properties]
+
+  profiles:
+    include:
+      - infrastructure-jpa
+      - infrastructure-jdbc
+    group:
+      local:
+        - local
+        - infrastructure-mysql-local
+        - infrastructure-oauth-local
+      prod:
+        - prod
+        - infrastructure-mysql-prod
+        - infrastructure-oauth-prod
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, heal

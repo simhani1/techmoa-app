@@ -1,11 +1,11 @@
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-	kotlin("jvm") apply false
-	kotlin("plugin.spring") apply false
-	id("org.springframework.boot") apply false
-	id("io.spring.dependency-management") apply false
-	kotlin("plugin.jpa") apply false
+	kotlin("jvm")
+	kotlin("plugin.spring")
+	kotlin("plugin.jpa")
+	id("org.springframework.boot")
+	id("io.spring.dependency-management")
 }
 
 allprojects {
@@ -34,52 +34,54 @@ allprojects {
 
 val kotestVersion = "5.9.1"
 val mockkVersion = "1.14.7"
-val fixtureMonkeyVersion = "1.1.15"
 
 subprojects {
 	apply(plugin = "org.jetbrains.kotlin.jvm")
-	apply(plugin = "io.spring.dependency-management")
-
-	if (path != ":app-domain") {
-		apply(plugin = "org.jetbrains.kotlin.plugin.spring")
-	}
-
-	if (path == ":app-infra:app-infra-db" || path == ":app-infra:app-infra-jpa") {
-		apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
-	}
-
-	extensions.configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
-		imports {
-			mavenBom(SpringBootPlugin.BOM_COORDINATES)
-		}
-	}
-
-	pluginManager.withPlugin("org.springframework.boot") {
-		if (project.name != "app-boot") {
-			tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-				enabled = false
-			}
-			tasks.named<org.gradle.jvm.tasks.Jar>("jar") {
-				enabled = true
-			}
-		}
-	}
 
 	dependencies {
-		if (path != ":app-domain") {
-			add("implementation", "org.jetbrains.kotlin:kotlin-reflect")
-			add("implementation", "org.slf4j:slf4j-api")
-		}
+		implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-		add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
+		testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-		if (path != ":app-domain") {
-			add("testImplementation", "org.springframework.boot:spring-boot-starter-test")
-		}
-		add("testImplementation", "org.jetbrains.kotlin:kotlin-test-junit5")
-		add("testImplementation", "io.kotest:kotest-runner-junit5:$kotestVersion")
-		add("testImplementation", "io.kotest:kotest-assertions-core:$kotestVersion")
-		add("testImplementation", "io.mockk:mockk:$mockkVersion")
-		add("testImplementation", "com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:$fixtureMonkeyVersion")
+		testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+		testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+		testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+		testImplementation("io.mockk:mockk:$mockkVersion")
 	}
+}
+
+// Spring 모듈 (domain 제외): Spring Boot + Actuator + Prometheus
+configure(subprojects.filter { it.name != "domain" }) {
+	apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+	apply(plugin = "org.springframework.boot")
+	apply(plugin = "io.spring.dependency-management")
+
+	dependencies {
+		implementation("org.springframework.boot:spring-boot-starter-web")
+		implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+		implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+		runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
+		testImplementation("org.springframework.boot:spring-boot-starter-test")
+	}
+
+	// boot 모듈만 bootJar 활성화
+	if (project.name != "boot") {
+		tasks.getByName<BootJar>("bootJar") {
+			enabled = false
+		}
+		tasks.getByName<Jar>("jar") {
+			enabled = true
+		}
+	}
+}
+
+// Root project는 빌드 결과물 비활성화
+tasks.getByName<BootJar>("bootJar") {
+	enabled = false
+}
+
+tasks.getByName<Jar>("jar") {
+	enabled = false
 }

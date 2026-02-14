@@ -1,4 +1,4 @@
-package site.techmoa.app.batch.rss
+package site.techmoa.app.api.batch.rss
 
 import io.mockk.Runs
 import io.mockk.every
@@ -9,6 +9,8 @@ import io.mockk.just
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import site.techmoa.app.batch.rss.RssClient
+import site.techmoa.app.batch.rss.RssReaderCollector
 import site.techmoa.app.common.article.ArticlePort
 import site.techmoa.app.common.blog.BlogPort
 import site.techmoa.app.common.blog.BlogStatus

@@ -3,7 +3,6 @@ package site.techmoa.app.batch.rss.support
 import com.apptasticsoftware.rssreader.Item
 import org.springframework.stereotype.Component
 import site.techmoa.app.batch.rss.ParsedItem
-import site.techmoa.app.batch.rss.RssClient
 import site.techmoa.app.common.article.Article
 import site.techmoa.app.common.blog.Blog
 import java.time.ZonedDateTime
@@ -23,11 +22,11 @@ import java.time.ZonedDateTime
 @Component
 class RssReaderClient(
     private val articleLinkManager: ArticleLinkManager,
-) : RssClient {
+) : site.techmoa.app.batch.rss.RssClient {
 
     private val rssReader = RssReaderFactory.getInstance()
 
-    override fun fetch(blog: Blog): List<Article> {
+    override fun fetch(blog: site.techmoa.app.common.blog.Blog): List<site.techmoa.app.common.article.Article> {
         val rawItems = rssReader.read(blog.rssLink)
             .toList()
         val items = rawItems.map { toItem(it, blog) }

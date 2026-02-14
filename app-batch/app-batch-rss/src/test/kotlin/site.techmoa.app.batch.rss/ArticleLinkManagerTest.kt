@@ -1,4 +1,4 @@
-package site.techmoa.app.batch.rss
+package site.techmoa.app.api.batch.rss
 
 import io.kotest.matchers.shouldBe
 import io.mockk.impl.annotations.InjectMockKs
