@@ -55,7 +55,7 @@ subprojects {
 	}
 
 	pluginManager.withPlugin("org.springframework.boot") {
-		if (name != "app-api") {
+		if (project.name != "app-boot") {
 			tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
 				enabled = false
 			}

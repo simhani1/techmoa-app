@@ -20,6 +20,7 @@ pluginManagement {
 rootProject.name = "app"
 
 include("app-api")
+include("app-boot")
 include("app-domain")
 
 include("app-core")
