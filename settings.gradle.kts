@@ -22,6 +22,8 @@ rootProject.name = "app"
 include("app-api")
 include("app-domain")
 
+include("app-core")
+
 include("app-batch:app-batch-rss")
 include("app-worker")
 include("app-worker:app-worker-webhook")

@@ -1,8 +1,8 @@
 val rssreaderVersion = "3.12.0"
 
 dependencies {
-    implementation(project(":app-api"))
-    testImplementation(testFixtures(project(":app-api")))
+    implementation(project(":app-core"))
+    testImplementation(testFixtures(project(":app-core")))
 
     // https://mvnrepository.com/artifact/com.apptasticsoftware/rssreader
     implementation("com.apptasticsoftware:rssreader:$rssreaderVersion")
