@@ -38,9 +38,15 @@ val fixtureMonkeyVersion = "1.1.15"
 
 subprojects {
 	apply(plugin = "org.jetbrains.kotlin.jvm")
-	apply(plugin = "org.jetbrains.kotlin.plugin.spring")
-	apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
 	apply(plugin = "io.spring.dependency-management")
+
+	if (path != ":app-domain") {
+		apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+	}
+
+	if (path == ":app-infra:app-infra-db" || path == ":app-infra:app-infra-jpa") {
+		apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+	}
 
 	extensions.configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
 		imports {
@@ -60,12 +66,16 @@ subprojects {
 	}
 
 	dependencies {
-		add("implementation", "org.jetbrains.kotlin:kotlin-reflect")
-		add("implementation", "org.slf4j:slf4j-api")
+		if (path != ":app-domain") {
+			add("implementation", "org.jetbrains.kotlin:kotlin-reflect")
+			add("implementation", "org.slf4j:slf4j-api")
+		}
 
 		add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
 
-		add("testImplementation", "org.springframework.boot:spring-boot-starter-test")
+		if (path != ":app-domain") {
+			add("testImplementation", "org.springframework.boot:spring-boot-starter-test")
+		}
 		add("testImplementation", "org.jetbrains.kotlin:kotlin-test-junit5")
 		add("testImplementation", "io.kotest:kotest-runner-junit5:$kotestVersion")
 		add("testImplementation", "io.kotest:kotest-assertions-core:$kotestVersion")
