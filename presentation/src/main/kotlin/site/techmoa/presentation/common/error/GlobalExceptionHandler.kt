@@ -26,6 +26,6 @@ class GlobalExceptionHandler {
 
         return ResponseEntity
             .status(errorType.status)
-            .body(ApiResponse.error(errorType, e.message))
+            .body(ApiResponse.error(errorType))
     }
 }
