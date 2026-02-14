@@ -8,4 +8,3 @@ dependencies {
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     testRuntimeOnly("com.h2database:h2")
 }
-
