@@ -11,8 +11,9 @@ class ProdCollectorScheduler(
     private val collector: CollectorTemplate
 ) {
     companion object {
-        const val EVERY_30_MINUTES = "0 1/30 * * * *"
+        const val EVERY_30_MINUTES = "0 */30 * * * *"
     }
+
     @Scheduled(cron = EVERY_30_MINUTES)
     fun run() {
         collector.execute()
