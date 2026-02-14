@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":app-core"))
+    implementation(project(":app-api"))
 
     compileOnly("org.springframework.boot:spring-boot")
     compileOnly("org.springframework:spring-web")

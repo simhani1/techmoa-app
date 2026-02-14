@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project(":app-core"))
+    implementation(project(":app-api"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.flywaydb:flyway-core")
