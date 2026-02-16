@@ -7,18 +7,18 @@ spring:
 
   profiles:
     include:
-      - infrastructure-jpa
-      - infrastructure-jdbc
       - infrastructure-oauth
     group:
       local:
         - local
         - infrastructure-mysql-local
         - infrastructure-jwt-local
+        - infrastructure-jpa-local
       prod:
         - prod
         - infrastructure-mysql-prod
         - infrastructure-jwt-prod
+        - infrastructure-jpa-prod
 
 management:
   endpoints:
