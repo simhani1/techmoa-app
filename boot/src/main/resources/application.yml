@@ -9,15 +9,16 @@ spring:
     include:
       - infrastructure-jpa
       - infrastructure-jdbc
+      - infrastructure-oauth
     group:
       local:
         - local
         - infrastructure-mysql-local
-        - infrastructure-oauth-local
+        - infrastructure-jwt-local
       prod:
         - prod
         - infrastructure-mysql-prod
-        - infrastructure-oauth-prod
+        - infrastructure-jwt-prod
 
 management:
   endpoints:
