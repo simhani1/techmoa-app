@@ -19,7 +19,11 @@ enum class ErrorType(
 
     KAKAO_CLIENT_ERROR(HttpStatus.BAD_REQUEST, ErrorCode.KAKAO_CLIENT_ERROR, "카카오 인증 요청이 올바르지 않습니다.", LogLevel.WARN),
     KAKAO_SERVER_ERROR(HttpStatus.BAD_GATEWAY, ErrorCode.KAKAO_SERVER_ERROR, "카카오 인증 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.", LogLevel.ERROR),
-    KID_NOT_MATCH(HttpStatus.UNAUTHORIZED, ErrorCode.KID_NOT_MATCH, "OIDC 토큰 검증에 실패했습니다.", LogLevel.WARN);
+    KID_NOT_MATCH(HttpStatus.UNAUTHORIZED, ErrorCode.KID_NOT_MATCH, "OIDC 토큰 검증에 실패했습니다.", LogLevel.WARN),
+
+    DUPLICATED_WEBHOOK(HttpStatus.BAD_REQUEST, ErrorCode.DUPLICATED_WEBHOOK, "이미 등록된 웹훅입니다.", LogLevel.INFO),
+    INVALID_WEBHOOK_PLATFORM(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_WEBHOOK_PLATFORM, "지원하지 않는 웹훅 플랫폼입니다.", LogLevel.INFO),
+    INVALID_WEBHOOK_URL(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_WEBHOOK_URL, "웹훅 URL 형식이 올바르지 않습니다.", LogLevel.INFO);
 
     companion object {
         fun from(errorCode: ErrorCode): ErrorType {
