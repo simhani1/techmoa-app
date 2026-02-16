@@ -14,7 +14,7 @@ class LocalRssCollectorTrigger(
         const val EVERY_2_MINUTES = "0 */2 * * * *"
     }
 
-    @Scheduled(cron = EVERY_2_MINUTES)
+    @Scheduled(cron = EVERY_2_MINUTES, scheduler = "rssTaskScheduler")
     fun run() {
         runWithDuration()
     }

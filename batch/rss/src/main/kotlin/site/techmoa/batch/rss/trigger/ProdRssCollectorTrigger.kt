@@ -14,7 +14,7 @@ class ProdRssCollectorTrigger(
         const val EVERY_30_MINUTES = "0 */30 * * * *"
     }
 
-    @Scheduled(cron = EVERY_30_MINUTES)
+    @Scheduled(cron = EVERY_30_MINUTES, scheduler = "rssTaskScheduler")
     fun run() {
         runWithDuration()
     }
