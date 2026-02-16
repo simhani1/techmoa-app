@@ -1,36 +1,15 @@
 package site.techmoa.batch.rss.trigger
 
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Profile
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
 import site.techmoa.batch.rss.domain.exception.RssCollectionExecutionException
 
-@Component
-class RssCollectorTrigger(
+abstract class RssCollectorTriggerSupport(
     private val collector: CollectRssUseCase
 ) {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
 
-    companion object {
-        const val EVERY_2_MINUTES = "0 */2 * * * *"
-        const val EVERY_30_MINUTES = "0 */30 * * * *"
-    }
-
-    @Profile("local")
-    @Scheduled(cron = EVERY_2_MINUTES)
-    fun runOnLocalProfile() {
-        runWithDuration()
-    }
-
-    @Profile("prod")
-    @Scheduled(cron = EVERY_30_MINUTES)
-    fun runOnProdProfile() {
-        runWithDuration()
-    }
-
-    private fun runWithDuration() {
+    protected fun runWithDuration() {
         val startAt = System.currentTimeMillis()
         log.info("[${this.javaClass.simpleName}] Starting collection")
 
