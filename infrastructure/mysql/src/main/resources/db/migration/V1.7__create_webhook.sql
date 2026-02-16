@@ -7,5 +7,6 @@ CREATE TABLE webhook
     url         VARCHAR(1000)         NOT NULL,
     validity    VARCHAR(20)           NOT NULL,
     platform    VARCHAR(20)           NOT NULL,
-    CONSTRAINT pk_webhook PRIMARY KEY (webhook_id)
+    CONSTRAINT pk_webhook PRIMARY KEY (webhook_id),
+    CONSTRAINT fk_webhook_member FOREIGN KEY (member_id) REFERENCES member (member_id)
 );
