@@ -1,7 +1,6 @@
 package site.techmoa.infrastructure.jpa.entity
 
 import jakarta.persistence.*
-import site.techmoa.domain.model.Member
 import site.techmoa.domain.model.Webhook
 import site.techmoa.domain.model.WebhookPlatform
 import site.techmoa.domain.model.WebhookValidity
@@ -16,16 +15,13 @@ class WebhookEntity(
     @Column(name = "url", nullable = false, length = 1000)
     val url: String,
 
-    @Column(name = "member_id", nullable = false)
-    val memberId: Long,
-
     @Enumerated(EnumType.STRING)
     @Column(name = "validity", nullable = false, length = 20)
-    val validity: WebhookValidity = WebhookValidity.VALID,
+    val validity: WebhookValidity,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "platform", nullable = false, length = 20)
-    val platform: WebhookPlatform = WebhookPlatform.DISCORD,
+    val platform: WebhookPlatform
 ) : BaseEntity() {
 
     companion object {
@@ -33,19 +29,16 @@ class WebhookEntity(
             return WebhookEntity(
                 id = webhook.id,
                 url = webhook.url,
-                memberId = webhook.owner.id,
                 validity = webhook.validity,
                 platform = webhook.platform,
             )
         }
     }
 
-    fun toDomain(owner: Member): Webhook {
-        require(owner.id == memberId) { "owner.id and memberId must be same." }
+    fun toDomain(): Webhook {
         return Webhook(
             id = id,
             url = url,
-            owner = owner,
             validity = validity,
             platform = platform,
         )
