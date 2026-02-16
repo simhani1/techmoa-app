@@ -1,5 +1,5 @@
 pluginManagement {
-    val kotlinVersion = "1.9.25"
+    val kotlinVersion = "2.0.0"
     val springBootVersion = "3.5.9"
     val springDependencyManagementVersion = "1.1.7"
 
@@ -26,6 +26,8 @@ include("application")
 
 include("infrastructure")
 include("infrastructure:mysql")
-include("infrastructure:jdbc")
 include("infrastructure:jpa")
 include("infrastructure:oauth")
+
+include("batch")
+include("batch:rss")
