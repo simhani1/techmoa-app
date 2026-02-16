@@ -1,0 +1,29 @@
+package site.techmoa.infrastructure.jpa.entity
+import jakarta.persistence.*
+import site.techmoa.domain.model.OauthProvider
+
+@Entity
+@Table(
+    name = "member",
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_provider_subject",
+            columnNames = ["provider", "subject"]
+        )
+    ]
+)
+class MemberEntity(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id", nullable = false)
+    val id: Long = 0L,
+
+    @Column(name = "email", nullable = false, length = 64)
+    val email: String,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", nullable = false, length = 20)
+    val provider: OauthProvider,
+
+    @Column(name = "subject", nullable = false, length = 64)
+    val subject: String
+) : BaseEntity()

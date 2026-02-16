@@ -1,0 +1,10 @@
+cors:
+  allowed-origins:
+    - ${CORS_ORIGIN_PROD}
+    - ${CORS_ORIGIN_DEV}
+
+logging:
+  level:
+    root: info
+    org.hibernate.SQL: off
+    org.hibernate.orm.jdbc.bind: off

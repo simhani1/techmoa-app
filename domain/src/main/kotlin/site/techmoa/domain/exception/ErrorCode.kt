@@ -1,0 +1,18 @@
+package site.techmoa.domain.exception
+
+enum class ErrorCode{
+    INTERNAL_SERVER_ERROR,
+    BAD_REQUEST,
+    NOT_FOUND_DATA,
+
+    // AUTH
+    UNAUTHORIZED,
+    FORBIDDEN,
+
+    // OAUTH
+    KAKAO_CLIENT_ERROR,
+    KAKAO_SERVER_ERROR,
+
+    // OIDC
+    KID_NOT_MATCH,
+}
