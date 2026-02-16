@@ -11,7 +11,7 @@ allOpen {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":application"))
-    implementation(project(":infrastructure:mysql"))
+    runtimeOnly(project(":infrastructure:mysql"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
