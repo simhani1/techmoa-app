@@ -27,6 +27,7 @@ logging:
 
 oauth:
   kakao:
+    base-url: dummy
     client-id: dummy
     client-secret: dummy
     redirect-uri: dummy
