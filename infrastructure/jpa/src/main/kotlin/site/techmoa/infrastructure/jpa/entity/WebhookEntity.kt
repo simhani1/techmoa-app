@@ -16,7 +16,7 @@ class WebhookEntity(
     @Column(name = "url", nullable = false, length = 1000)
     val url: String,
 
-    @JoinColumn(name = "member_id", nullable = false)
+    @Column(name = "member_id", nullable = false)
     val memberId: Long,
 
     @Enumerated(EnumType.STRING)
@@ -27,6 +27,7 @@ class WebhookEntity(
     @Column(name = "platform", nullable = false, length = 20)
     val platform: WebhookPlatform = WebhookPlatform.DISCORD,
 ) : BaseEntity() {
+
     companion object {
         fun from(webhook: Webhook): WebhookEntity {
             return WebhookEntity(
@@ -41,7 +42,6 @@ class WebhookEntity(
 
     fun toDomain(owner: Member): Webhook {
         require(owner.id == memberId) { "owner.id and memberId must be same." }
-
         return Webhook(
             id = id,
             url = url,
