@@ -10,9 +10,7 @@ plugins {
 	id("org.sonarqube")
 }
 
-dependencies {
-	subprojects.forEach(::jacocoAggregation)
-}
+apply(from = "gradle/jacoco.gradle.kts")
 
 allprojects {
 	group = "site"
@@ -40,7 +38,6 @@ allprojects {
 
 subprojects {
 	apply(plugin = "org.jetbrains.kotlin.jvm")
-	apply(plugin = "jacoco")
 
 	dependencies {
 		implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -88,25 +85,4 @@ tasks.named<BootJar>("bootJar") {
 
 tasks.named<Jar>("jar") {
 	enabled = false
-}
-
-reporting {
-	reports {
-		val testCodeCoverageReport by getting(JacocoCoverageReport::class) {
-			testSuiteName = "test"
-		}
-	}
-}
-
-tasks.named<JacocoReport>("testCodeCoverageReport") {
-	dependsOn(subprojects.map { it.tasks.named("test") })
-
-	reports {
-		xml.required.set(true)
-		html.required.set(true)
-	}
-}
-
-tasks.named<Test>("test") {
-	finalizedBy(tasks.named("testCodeCoverageReport"))
 }
