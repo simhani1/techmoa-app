@@ -6,6 +6,12 @@ plugins {
 	kotlin("plugin.jpa")
 	id("org.springframework.boot")
 	id("io.spring.dependency-management")
+	id("jacoco-report-aggregation")
+	id("org.sonarqube")
+}
+
+dependencies {
+	subprojects.forEach(::jacocoAggregation)
 }
 
 allprojects {
@@ -17,7 +23,7 @@ allprojects {
 		mavenCentral()
 	}
 
-	tasks.withType<Test> {
+	tasks.withType<Test>().configureEach {
 		useJUnitPlatform()
 
 		testLogging {
@@ -34,6 +40,7 @@ allprojects {
 
 subprojects {
 	apply(plugin = "org.jetbrains.kotlin.jvm")
+	apply(plugin = "jacoco")
 
 	dependencies {
 		implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -65,20 +72,41 @@ configure(subprojects.filter { it.name != "domain" }) {
 
 	// boot 모듈만 bootJar 활성화
 	if (project.name != "boot") {
-		tasks.getByName<BootJar>("bootJar") {
+		tasks.named<BootJar>("bootJar") {
 			enabled = false
 		}
-		tasks.getByName<Jar>("jar") {
+		tasks.named<Jar>("jar") {
 			enabled = true
 		}
 	}
 }
 
 // Root project는 빌드 결과물 비활성화
-tasks.getByName<BootJar>("bootJar") {
+tasks.named<BootJar>("bootJar") {
 	enabled = false
 }
 
-tasks.getByName<Jar>("jar") {
+tasks.named<Jar>("jar") {
 	enabled = false
+}
+
+reporting {
+	reports {
+		val testCodeCoverageReport by getting(JacocoCoverageReport::class) {
+			testSuiteName = "test"
+		}
+	}
+}
+
+tasks.named<JacocoReport>("testCodeCoverageReport") {
+	dependsOn(subprojects.map { it.tasks.named("test") })
+
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+}
+
+tasks.named<Test>("test") {
+	finalizedBy(tasks.named("testCodeCoverageReport"))
 }
