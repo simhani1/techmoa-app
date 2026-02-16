@@ -1,7 +1,7 @@
 pluginManagement {
-    val kotlinVersion = "2.0.0"
-    val springBootVersion = "3.5.9"
-    val springDependencyManagementVersion = "1.1.7"
+    val kotlinVersion = providers.gradleProperty("kotlinVersion").get()
+    val springBootVersion = providers.gradleProperty("springBootVersion").get()
+    val springDependencyManagementVersion = providers.gradleProperty("springDependencyManagementVersion").get()
 
     repositories {
         gradlePluginPortal()

@@ -32,9 +32,6 @@ allprojects {
 	}
 }
 
-val kotestVersion = "5.9.1"
-val mockkVersion = "1.14.7"
-
 subprojects {
 	apply(plugin = "org.jetbrains.kotlin.jvm")
 
@@ -44,9 +41,9 @@ subprojects {
 		testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 		testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-		testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-		testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-		testImplementation("io.mockk:mockk:$mockkVersion")
+		testImplementation("io.kotest:kotest-runner-junit5:${property("kotestVersion")}")
+		testImplementation("io.kotest:kotest-assertions-core:${property("kotestVersion")}")
+		testImplementation("io.mockk:mockk:${property("mockkVersion")}")
 	}
 }
 
