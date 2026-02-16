@@ -1,10 +1,10 @@
-package site.techmoa.app.batch.rss.support
+package site.techmoa.batch.rss.support
 
 import com.apptasticsoftware.rssreader.Item
+import com.apptasticsoftware.rssreader.RssReader
 import org.springframework.stereotype.Component
-import site.techmoa.app.batch.rss.ParsedItem
-import site.techmoa.app.common.article.Article
-import site.techmoa.app.common.blog.Blog
+import site.techmoa.batch.rss.domain.model.Article
+import site.techmoa.batch.rss.domain.model.Blog
 import java.time.ZonedDateTime
 
 /**
@@ -22,22 +22,24 @@ import java.time.ZonedDateTime
 @Component
 class RssReaderClient(
     private val articleLinkManager: ArticleLinkManager,
-) : site.techmoa.app.batch.rss.RssClient {
+) : RssClient {
 
-    private val rssReader = RssReaderFactory.getInstance()
+    private val rssReader = RssReader().addFeedFilter(CustomInvalidXmlCharacterFilter()) as RssReader
 
-    override fun fetch(blog: site.techmoa.app.common.blog.Blog): List<site.techmoa.app.common.article.Article> {
+    override fun fetch(blog: Blog): List<Article> {
         val rawItems = rssReader.read(blog.rssLink)
             .toList()
         val items = rawItems.map { toItem(it, blog) }
             .filterIsInstance<ParsedItem.Valid>()
-        return items.map { Article.of(
-            blogId = blog.id,
-            title = it.title,
-            link = it.link,
-            guid = it.guid,
-            pubDate = it.pubDate,
-        ) }
+        return items.map {
+            Article.of(
+                blogId = blog.id,
+                title = it.title,
+                link = it.link,
+                guid = it.guid,
+                pubDate = it.pubDate
+            )
+        }
     }
 
     private fun toItem(rssItem: Item, blog: Blog): ParsedItem {

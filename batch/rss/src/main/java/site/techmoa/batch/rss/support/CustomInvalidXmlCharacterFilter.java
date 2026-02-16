@@ -1,4 +1,4 @@
-package site.techmoa.batch.rss;
+package site.techmoa.batch.rss.support;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
