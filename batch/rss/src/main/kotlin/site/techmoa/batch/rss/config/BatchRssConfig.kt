@@ -1,0 +1,9 @@
+package site.techmoa.batch.rss.config
+
+import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.annotation.EnableScheduling
+
+@Configuration
+@EnableScheduling
+class BatchRssConfig {
+}

@@ -1,11 +1,11 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-	kotlin("jvm") version "1.9.25" apply false
-	kotlin("plugin.spring") version "1.9.25" apply false
-	id("org.springframework.boot") version "3.5.9" apply false
-	id("io.spring.dependency-management") version "1.1.7" apply false
-	kotlin("plugin.jpa") version "1.9.25" apply false
+	kotlin("jvm")
+	kotlin("plugin.spring")
+	kotlin("plugin.jpa")
+	id("org.springframework.boot")
+	id("io.spring.dependency-management")
 }
 
 allprojects {
@@ -16,33 +16,72 @@ allprojects {
 	repositories {
 		mavenCentral()
 	}
-}
-
-subprojects {
-	apply(plugin = "org.jetbrains.kotlin.jvm")
-	apply(plugin = "org.jetbrains.kotlin.plugin.spring")
-	apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
-	apply(plugin = "io.spring.dependency-management")
-
-	extensions.configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
-		imports {
-			mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.9")
-		}
-	}
 
 	tasks.withType<Test> {
 		useJUnitPlatform()
-	}
 
-	extensions.configure<JavaPluginExtension> {
-		toolchain {
-			languageVersion = JavaLanguageVersion.of(17)
+		testLogging {
+			showStandardStreams = true
+			events("passed", "skipped", "failed")
+
+			debug {
+				events("standardOut", "standardError")
+				exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+			}
 		}
 	}
+}
 
-	tasks.withType<KotlinCompile>().configureEach {
-		compilerOptions {
-			freeCompilerArgs.add("-Xjsr305=strict")
+val kotestVersion = "5.9.1"
+val mockkVersion = "1.14.7"
+
+subprojects {
+	apply(plugin = "org.jetbrains.kotlin.jvm")
+
+	dependencies {
+		implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+		testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+		testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+		testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+		testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+		testImplementation("io.mockk:mockk:$mockkVersion")
+	}
+}
+
+// Spring 모듈 (domain 제외): Spring Boot + Actuator + Prometheus
+configure(subprojects.filter { it.name != "domain" }) {
+	apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+	apply(plugin = "org.springframework.boot")
+	apply(plugin = "io.spring.dependency-management")
+
+	dependencies {
+		implementation("org.springframework.boot:spring-boot-starter-web")
+		implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+		implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+		runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
+		testImplementation("org.springframework.boot:spring-boot-starter-test")
+	}
+
+	// boot 모듈만 bootJar 활성화
+	if (project.name != "boot") {
+		tasks.getByName<BootJar>("bootJar") {
+			enabled = false
+		}
+		tasks.getByName<Jar>("jar") {
+			enabled = true
 		}
 	}
+}
+
+// Root project는 빌드 결과물 비활성화
+tasks.getByName<BootJar>("bootJar") {
+	enabled = false
+}
+
+tasks.getByName<Jar>("jar") {
+	enabled = false
 }
