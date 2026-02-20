@@ -33,3 +33,4 @@ include("infrastructure:oauth")
 
 include("batch")
 include("batch:rss")
+include("batch:schedules")

@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":presentation"))
     implementation(project(":application"))
     implementation(project(":batch:rss"))
+    implementation(project(":batch:schedules"))
     implementation(project(":infrastructure:oauth"))
     implementation(project(":infrastructure:mysql"))
     implementation(project(":infrastructure:jpa"))
