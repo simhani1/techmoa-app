@@ -34,7 +34,6 @@ class RssReaderClient(
         return items.map {
             Article.of(
                 blogId = blog.id,
-                blogName = blog.name,
                 title = it.title,
                 link = it.link,
                 guid = it.guid,
