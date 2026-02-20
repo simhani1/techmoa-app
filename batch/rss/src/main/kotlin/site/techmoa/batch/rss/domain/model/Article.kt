@@ -3,6 +3,7 @@ package site.techmoa.batch.rss.domain.model
 data class Article(
     val id: Long,
     val blogId: Long,
+    val blogName: String,
     val title: String,
     val link: String,
     val guid: String,
@@ -13,6 +14,7 @@ data class Article(
         fun of(
             id: Long = 0,
             blogId: Long,
+            blogName: String,
             title: String,
             link: String,
             guid: String,
@@ -22,6 +24,7 @@ data class Article(
             return Article(
                 id = id,
                 blogId = blogId,
+                blogName = blogName,
                 title = title,
                 link = link,
                 guid = guid,
