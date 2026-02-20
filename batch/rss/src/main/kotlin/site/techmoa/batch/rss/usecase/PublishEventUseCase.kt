@@ -32,8 +32,8 @@ class PublishEventUseCase(
                 )
             }
         )
-        eventPublisher.publishEvent(event)
         log.info("[${this.javaClass.simpleName}] Publish NewArticlesCollectedEvent: size=${event.size()}")
+        eventPublisher.publishEvent(event)
     }
 
     private fun idempotencyKeyOf(article: Article): String {
