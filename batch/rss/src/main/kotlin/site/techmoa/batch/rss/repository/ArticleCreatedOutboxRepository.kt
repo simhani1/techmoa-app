@@ -17,28 +17,23 @@ class ArticleCreatedOutboxRepository(
         val sql = """
             INSERT IGNORE
             INTO article_created_outbox (
-                payload,
+                blog_id,
+                guid,
                 idempotency_key,
                 status,
                 last_error_message,
                 created_at,
                 updated_at
             )
-            VALUES (
-                ?,
-                ?,
-                ?,
-                NULL,
-                ?,
-                ?
-            )
+            VALUES (?, ?, ?, ?, NULL, ?, ?);
         """.trimIndent()
 
-        val batchArgs = outboxes.map { outbox ->
+        val batchArgs = outboxes.map {
             arrayOf(
-                outbox.payload,
-                outbox.idempotencyKey,
-                outbox.status.toString(),
+                it.blogId,
+                it.guid,
+                it.idempotencyKey,
+                it.status.toString(),
                 now,
                 now
             )

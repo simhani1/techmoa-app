@@ -1,6 +1,5 @@
 package site.techmoa.batch.rss.usecase
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.context.ApplicationEvent
@@ -12,8 +11,7 @@ import site.techmoa.batch.rss.domain.model.Article
 class PublishEventUseCaseTest : BehaviorSpec({
 
     val eventPublisher = MockEventPublisher()
-    val objectMapper = ObjectMapper()
-    val eventUseCase = PublishEventUseCase(eventPublisher, objectMapper)
+    val eventUseCase = PublishEventUseCase(eventPublisher)
 
     afterEach() {
         eventPublisher.clear()
@@ -51,29 +49,22 @@ class PublishEventUseCaseTest : BehaviorSpec({
         )
 
         `when`("이벤트를 발행하면") {
-            eventUseCase.publish(articles)
-
             then("NewArticlesCollectedEvent가 발행된다") {
+                eventUseCase.publish(articles)
                 eventPublisher.events.size shouldBe 1
 
                 val event = eventPublisher.events.first() as NewArticlesCollectedEvent
                 event.size() shouldBe 2
 
+                event.events[0].blogId shouldBe 1L
+                event.events[0].guid shouldBe "guid-1"
                 event.events[0].idempotencyKey shouldBe "202403:1:guid-1"
                 event.events[0].status shouldBe OutboxStatus.PENDING
-                val payload0 = objectMapper.readTree(event.events[0].payload)
-                payload0["blogName"].asText() shouldBe "기술 블로그"
-                payload0["title"].asText() shouldBe "첫 글"
-                payload0["link"].asText() shouldBe "https://example.com/1"
-                payload0["guid"].asText() shouldBe "guid-1"
 
+                event.events[1].blogId shouldBe 2L
+                event.events[1].guid shouldBe "guid-2"
                 event.events[1].idempotencyKey shouldBe "202404:2:guid-2"
                 event.events[1].status shouldBe OutboxStatus.PENDING
-                val payload1 = objectMapper.readTree(event.events[1].payload)
-                payload1["blogName"].asText() shouldBe "테크모아"
-                payload1["title"].asText() shouldBe "둘째 글"
-                payload1["link"].asText() shouldBe "https://example.com/2"
-                payload1["guid"].asText() shouldBe "guid-2"
             }
         }
     }

@@ -4,14 +4,20 @@ data class NewArticlesCollectedEvent(
     val events: List<ArticleCreatedOutboxEvent>
 ) {
     data class ArticleCreatedOutboxEvent private constructor(
-        val payload: String,
+        val blogId: Long,
+        val guid: String,
         val idempotencyKey: String,
         val status: OutboxStatus
     ) {
         companion object {
-            fun pending(payload: String, idempotencyKey: String): ArticleCreatedOutboxEvent {
+            fun pending(
+                blogId: Long,
+                guid: String,
+                idempotencyKey: String
+            ): ArticleCreatedOutboxEvent {
                 return ArticleCreatedOutboxEvent(
-                    payload,
+                    blogId,
+                    guid,
                     idempotencyKey,
                     OutboxStatus.PENDING
                 )

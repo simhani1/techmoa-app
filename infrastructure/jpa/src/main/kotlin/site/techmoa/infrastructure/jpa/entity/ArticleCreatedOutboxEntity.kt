@@ -5,6 +5,12 @@ import jakarta.persistence.*
 @Entity
 @Table(
     name = "article_created_outbox",
+    indexes = [
+        Index(
+            name = "idx_article_created_outbox_blog_id_guid",
+            columnList = "blog_id, guid"
+        )
+    ],
     uniqueConstraints = [
         UniqueConstraint(
             name = "uk_article_created_outbox_idempotency_key",
@@ -17,22 +23,11 @@ class ArticleCreatedOutboxEntity(
     @Column(name = "article_created_outbox_id", nullable = false)
     var id: Long = 0L,
 
-    @Lob
-    @Column(name = "payload", nullable = false)
-    val payload: String,
+    @Column(name = "blog_id", nullable = false)
+    val blogId: Long,
+
+    @Column(name = "guid", nullable = false, length = 600)
+    val guid: String,
 
     idempotencyKey: String,
-) : OutboxBaseEntity(idempotencyKey = idempotencyKey) {
-
-    companion object {
-        fun of(
-            payload: String,
-            idempotencyKey: String
-        ): ArticleCreatedOutboxEntity {
-            return ArticleCreatedOutboxEntity(
-                payload = payload,
-                idempotencyKey = idempotencyKey
-            )
-        }
-    }
-}
+) : OutboxBaseEntity(idempotencyKey = idempotencyKey)

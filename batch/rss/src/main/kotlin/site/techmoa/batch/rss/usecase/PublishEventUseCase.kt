@@ -1,6 +1,5 @@
 package site.techmoa.batch.rss.usecase
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
@@ -14,7 +13,6 @@ import java.time.format.DateTimeFormatter
 @Component
 class PublishEventUseCase(
     private val eventPublisher: ApplicationEventPublisher,
-    private val objectMapper: ObjectMapper,
 ) {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
@@ -28,24 +26,14 @@ class PublishEventUseCase(
         val event = NewArticlesCollectedEvent(
             events = articles.map {
                 ArticleCreatedOutboxEvent.pending(
-                    payload = payloadOf(it),
+                    blogId = it.blogId,
+                    guid = it.guid,
                     idempotencyKey = idempotencyKeyOf(it),
                 )
             }
         )
         eventPublisher.publishEvent(event)
         log.info("[${this.javaClass.simpleName}] Publish NewArticlesCollectedEvent: size=${event.size()}")
-    }
-
-    private fun payloadOf(article: Article): String {
-        return objectMapper.writeValueAsString(
-            mapOf(
-                "blogName" to article.blogName,
-                "title" to article.title,
-                "link" to article.link,
-                "guid" to article.guid,
-            )
-        )
     }
 
     private fun idempotencyKeyOf(article: Article): String {
