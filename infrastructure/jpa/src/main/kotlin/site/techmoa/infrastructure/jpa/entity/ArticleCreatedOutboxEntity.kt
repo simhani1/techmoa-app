@@ -17,9 +17,6 @@ class ArticleCreatedOutboxEntity(
     @Column(name = "article_created_outbox_id", nullable = false)
     var id: Long = 0L,
 
-    @Column(name = "article_id", nullable = false)
-    val articleId: Long,
-
     @Lob
     @Column(name = "payload", nullable = false)
     val payload: String,
@@ -29,12 +26,10 @@ class ArticleCreatedOutboxEntity(
 
     companion object {
         fun of(
-            articleId: Long,
             payload: String,
             idempotencyKey: String
         ): ArticleCreatedOutboxEntity {
             return ArticleCreatedOutboxEntity(
-                articleId = articleId,
                 payload = payload,
                 idempotencyKey = idempotencyKey
             )
