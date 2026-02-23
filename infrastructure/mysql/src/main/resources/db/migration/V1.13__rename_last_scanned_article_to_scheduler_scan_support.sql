@@ -1,0 +1,1 @@
+RENAME TABLE last_scanned_article TO scheduler_scan_support;
