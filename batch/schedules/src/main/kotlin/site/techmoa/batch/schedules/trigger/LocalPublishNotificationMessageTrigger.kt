@@ -3,13 +3,13 @@ package site.techmoa.batch.schedules.trigger
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import site.techmoa.batch.schedules.usecase.PublishNotificationMessageUseCase
+import site.techmoa.batch.schedules.service.ScanNewArticlesService
 
 @Component
 @Profile("local")
 class LocalPublishNotificationMessageTrigger(
-    useCase: PublishNotificationMessageUseCase
-) : PublishNotificationMessageTriggerSupport(useCase) {
+    service: ScanNewArticlesService
+) : PublishNotificationMessageTriggerSupport(service) {
 
     companion object {
         const val EVERY_2_MINUTES = "0 */2 * * * *"

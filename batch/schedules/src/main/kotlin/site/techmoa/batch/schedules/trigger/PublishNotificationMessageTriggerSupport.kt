@@ -1,10 +1,10 @@
 package site.techmoa.batch.schedules.trigger
 
 import org.slf4j.LoggerFactory
-import site.techmoa.batch.schedules.usecase.PublishNotificationMessageUseCase
+import site.techmoa.batch.schedules.service.ScanNewArticlesService
 
 abstract class PublishNotificationMessageTriggerSupport(
-    private val useCase: PublishNotificationMessageUseCase
+    private val service: ScanNewArticlesService
 ) {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
@@ -14,7 +14,7 @@ abstract class PublishNotificationMessageTriggerSupport(
         log.info("[{}] Starting notification publish scheduler", this.javaClass.simpleName)
 
         try {
-            useCase.execute()
+            service.execute()
             val elapsedMs = System.currentTimeMillis() - startAt
             log.info("[{}] Finished scheduler, elapsedMs={}", this.javaClass.simpleName, elapsedMs)
         } catch (ex: Throwable) {
