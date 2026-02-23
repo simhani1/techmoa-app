@@ -1,9 +1,12 @@
 package site.techmoa.batch.schedules.event
 
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 import site.techmoa.batch.schedules.annotation.EventHandler
 import site.techmoa.batch.schedules.repository.OutboxRepository
+import site.techmoa.domain.event.NewArticlesEvents
 
 @EventHandler
 class NewArticlesEventHandler(
@@ -11,12 +14,8 @@ class NewArticlesEventHandler(
 ) {
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @Transactional(propagation = Propagation.MANDATORY)
     fun recordMessage(event: NewArticlesEvents) {
         outboxRepository.save(event)
-    }
-
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    fun publishMessage(event: NewArticlesEvents) {
-
     }
 }

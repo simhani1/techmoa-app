@@ -2,8 +2,8 @@ package site.techmoa.batch.schedules.usecase
 
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
-import site.techmoa.batch.schedules.event.NewArticlesEvents
 import site.techmoa.domain.model.Article
+import site.techmoa.domain.event.NewArticlesEvents
 import site.techmoa.domain.model.Webhook
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
