@@ -65,7 +65,6 @@ class WebhookRestPublisher(
 
         return DiscordWebhookPayload(
             username = "TechMoaNews",
-            avatarUrl = "https://avatars.githubusercontent.com/u/6031226?v=4",
             embeds = listOf(embed)
         )
     }
