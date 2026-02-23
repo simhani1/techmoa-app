@@ -30,6 +30,7 @@ include("infrastructure")
 include("infrastructure:mysql")
 include("infrastructure:jpa")
 include("infrastructure:oauth")
+include("infrastructure:rest")
 
 include("batch")
 include("batch:rss")
