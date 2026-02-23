@@ -7,7 +7,7 @@ import site.techmoa.batch.rss.port.ArticlePort
 import java.sql.Timestamp
 import java.time.Instant
 
-@Repository
+@Repository(value = "RssArticleRepository")
 class ArticleRepository(
     private val jdbcTemplate: JdbcTemplate
 ) : ArticlePort {

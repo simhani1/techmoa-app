@@ -1,7 +1,8 @@
 pluginManagement {
-    val kotlinVersion = "2.0.0"
-    val springBootVersion = "3.5.9"
-    val springDependencyManagementVersion = "1.1.7"
+    val kotlinVersion = providers.gradleProperty("kotlinVersion").get()
+    val springBootVersion = providers.gradleProperty("springBootVersion").get()
+    val springDependencyManagementVersion = providers.gradleProperty("springDependencyManagementVersion").get()
+    val sonarQubePluginVersion = providers.gradleProperty("sonarQubePluginVersion").get()
 
     repositories {
         gradlePluginPortal()
@@ -14,6 +15,7 @@ pluginManagement {
         kotlin("plugin.jpa") version kotlinVersion
         id("org.springframework.boot") version springBootVersion
         id("io.spring.dependency-management") version springDependencyManagementVersion
+        id("org.sonarqube") version sonarQubePluginVersion
     }
 }
 
@@ -28,6 +30,8 @@ include("infrastructure")
 include("infrastructure:mysql")
 include("infrastructure:jpa")
 include("infrastructure:oauth")
+include("infrastructure:rest")
 
 include("batch")
 include("batch:rss")
+include("batch:schedules")

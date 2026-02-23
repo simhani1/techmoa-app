@@ -30,3 +30,18 @@ class KidNotMatchException(
     override val message: String,
     override val cause: Throwable? = null,
 ) : DomainException(ErrorCode.KID_NOT_MATCH, message, cause)
+
+class DuplicatedWebhookException(
+    override val message: String,
+    override val cause: Throwable? = null,
+) : DomainException(ErrorCode.DUPLICATED_WEBHOOK, message, cause)
+
+class InvalidWebhookPlatformException(
+    override val message: String,
+    override val cause: Throwable? = null,
+) : DomainException(ErrorCode.INVALID_WEBHOOK_PLATFORM, message, cause)
+
+class InvalidWebhookUrlException(
+    override val message: String,
+    override val cause: Throwable? = null,
+) : DomainException(ErrorCode.INVALID_WEBHOOK_URL, message, cause)

@@ -6,7 +6,7 @@ import site.techmoa.batch.rss.domain.model.Blog
 import site.techmoa.batch.rss.domain.model.BlogStatus
 import site.techmoa.batch.rss.port.BlogPort
 
-@Repository
+@Repository(value = "RssBlogRepository")
 class BlogRepository(
     private val jdbcTemplate: JdbcTemplate
 ) : BlogPort {

@@ -13,7 +13,7 @@ import site.techmoa.batch.rss.trigger.CollectRssUseCase
 class CollectByRssReaderUseCase(
     private val rssClient: RssClient,
     private val articlePort: ArticlePort,
-    private val blogPort: BlogPort,
+    private val blogPort: BlogPort
 ) : CollectRssUseCase {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
