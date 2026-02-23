@@ -16,4 +16,7 @@ interface ArticleJpaRepository : JpaRepository<ArticleEntity, Long> {
     @Modifying
     @Query("update ArticleEntity a set a._views = a._views + 1 where a.id = :id")
     fun increaseViews(@Param("id") id: Long): Int
+
+    @Query("select a from ArticleEntity a where a.id > :id")
+    fun findByIdGreaterThan(articleId: Long): List<ArticleEntity>
 }

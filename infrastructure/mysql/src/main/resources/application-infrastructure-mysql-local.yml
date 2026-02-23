@@ -1,6 +1,16 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/techmoa?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    url : >
+      jdbc:mysql://localhost:3306/techmoa
+      ?useSSL=false
+      &rewriteBatchedStatements=true
+      &cachePrepStmts=true
+      &useServerPrepStmts=true
+      &serverTimezone=Asia/Seoul
+      &characterEncoding=UTF-8
+      &profileSQL=true
+      &logger=com.mysql.cj.log.Slf4JLogger
+      &maxQuerySizeToLog=8192
     username: root
     password: root

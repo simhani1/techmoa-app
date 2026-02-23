@@ -11,7 +11,6 @@ import site.techmoa.batch.rss.trigger.CollectRssUseCase
 
 @Component
 class CollectByRssReaderUseCase(
-    private val eventUseCase: PublishEventUseCase,
     private val rssClient: RssClient,
     private val articlePort: ArticlePort,
     private val blogPort: BlogPort
@@ -32,8 +31,5 @@ class CollectByRssReaderUseCase(
         // 3. 아티클 저장
         log.info("[${this.javaClass.simpleName}] Save New Articles")
         articlePort.saveAllIgnoringDuplicates(articles)
-
-        // 4. 아웃박스 기록
-        eventUseCase.publish(articles)
     }
 }
