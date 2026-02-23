@@ -1,4 +1,4 @@
-package site.techmoa.batch.schedules.trigger
+package site.techmoa.batch.schedules.trigger.support
 
 import org.slf4j.LoggerFactory
 import site.techmoa.batch.schedules.service.ScanNewArticlesService

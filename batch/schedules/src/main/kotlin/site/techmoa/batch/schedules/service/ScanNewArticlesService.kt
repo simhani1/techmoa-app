@@ -31,6 +31,7 @@ class ScanNewArticlesService(
 
         // 3. 웹훅 url 조회
         val webhooks = webhookRepository.getValidWebhook()
+        if (webhooks.isEmpty()) return  // 3-1. 제약 ( 웹훅이 없으면 중단 )
 
         // 4. 마지막 스캔 id 저장
         lastScannedArticleUseCase.sync(newArticles.last().id)
@@ -38,6 +39,5 @@ class ScanNewArticlesService(
 
         // 5. 커밋 직전 아웃박스 테이블 기록 (원자성 보장) -> 별도 유스케이스를 분리하여 Before Commit 이벤트 리슨
         newArticlesEventUseCase.publish(newArticles, webhooks)
-        // 6. 커밋 직후 MQ로 이벤트 Pub -> 별도 우스케이스를 분리하여 After Commit 이벤트 리슨
     }
 }

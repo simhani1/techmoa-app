@@ -9,6 +9,17 @@ import site.techmoa.domain.model.Article
 class ArticleRepository(
     private val jdbcTemplate: JdbcTemplate
 ) {
+    private val rowMapper = RowMapper { rs, _ ->
+        Article(
+            id = rs.getLong("article_id"),
+            blogId = rs.getLong("blog_id"),
+            title = rs.getString("title"),
+            link = rs.getString("link"),
+            guid = rs.getString("guid"),
+            pubDate = rs.getLong("pub_date"),
+            views = rs.getInt("views")
+        )
+    }
 
     fun findByIdGreaterThan(articleId: Long): List<Article> {
         val sql = """
@@ -17,22 +28,29 @@ class ArticleRepository(
             WHERE article_id > ?
         """.trimIndent()
 
-        val rowMapper = RowMapper { rs, _ ->
-            Article(
-                id = rs.getLong("article_id"),
-                blogId = rs.getLong("blog_id"),
-                title = rs.getString("title"),
-                link = rs.getString("link"),
-                guid = rs.getString("guid"),
-                pubDate = rs.getLong("pub_date"),
-                views = rs.getInt("views")
-            )
-        }
-
         return jdbcTemplate.query(
             sql,
             rowMapper,
             articleId
         )
+    }
+
+    fun findByBlogIdAndGuid(blogId: Long, guid: String): Article? {
+        val sql = """
+            SELECT article_id, blog_id, title, link, guid, pub_date, views
+            FROM article
+            WHERE blog_id = ?
+                AND guid = ?
+            LIMIT 1
+        """.trimIndent()
+
+        val result = jdbcTemplate.query(
+            sql,
+            rowMapper,
+            blogId,
+            guid
+        )
+
+        return result.firstOrNull()
     }
 }

@@ -14,7 +14,7 @@ class NewArticlesEventHandler(
 ) {
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    @Transactional(isolation = Propagation.MANDATORY)
+    @Transactional(propagation = Propagation.MANDATORY)
     fun recordMessage(event: NewArticlesEvents) {
         outboxRepository.save(event)
     }

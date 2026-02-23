@@ -1,9 +1,10 @@
-package site.techmoa.batch.schedules.trigger
+package site.techmoa.batch.schedules.trigger.local
 
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import site.techmoa.batch.schedules.service.ScanNewArticlesService
+import site.techmoa.batch.schedules.trigger.support.PublishNotificationMessageTriggerSupport
 
 @Component
 @Profile("local")
