@@ -1,4 +1,4 @@
-package site.techmoa.batch.schedules.event
+package site.techmoa.domain.event
 
 import site.techmoa.domain.model.Article
 import site.techmoa.domain.model.Webhook
