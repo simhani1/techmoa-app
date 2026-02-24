@@ -25,7 +25,12 @@ class SaveWebhookUseCaseTest : BehaviorSpec({
         }
 
         `when`("중복이 아닌 url을 저장하면") {
-            val result = useCase.save(WebhookPlatform.DISCORD, "https://discord.com/api/webhooks/123")
+            val result = useCase.save(
+                Webhook.of(
+                    platform = WebhookPlatform.DISCORD,
+                    url = "https://discord.com/api/webhooks/123",
+                )
+            )
 
             then("저장 후 생성된 webhook을 반환한다") {
                 result.id shouldBe 1L
@@ -45,7 +50,12 @@ class SaveWebhookUseCaseTest : BehaviorSpec({
         `when`("동일한 url을 저장하면") {
             then("DuplicatedWebhookException을 던진다") {
                 val exception = shouldThrow<DuplicatedWebhookException> {
-                    useCase.save(WebhookPlatform.DISCORD, "https://discord.com/api/webhooks/dup")
+                    useCase.save(
+                        Webhook.of(
+                            platform = WebhookPlatform.DISCORD,
+                            url = "https://discord.com/api/webhooks/dup",
+                        )
+                    )
                 }
                 exception.errorCode.name shouldBe "DUPLICATED_WEBHOOK"
                 verify(exactly = 0) { webhookPort.save(any()) }

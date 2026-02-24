@@ -1,5 +1,5 @@
 package site.techmoa.presentation.controller.response
 
-class SaveWebhookResponse(
+data class SaveWebhookResponse(
     val webhookId: Long
 )

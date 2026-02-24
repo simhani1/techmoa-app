@@ -2,6 +2,8 @@ package site.techmoa.batch.rss.repository
 
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import site.techmoa.batch.rss.domain.model.Article
 import site.techmoa.batch.rss.port.ArticlePort
 import java.sql.Timestamp
@@ -12,6 +14,7 @@ class ArticleRepository(
     private val jdbcTemplate: JdbcTemplate
 ) : ArticlePort {
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun saveAllIgnoringDuplicates(articles: List<Article>) {
         if (articles.isEmpty()) return
 

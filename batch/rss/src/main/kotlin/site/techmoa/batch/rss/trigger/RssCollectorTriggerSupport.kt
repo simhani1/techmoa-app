@@ -11,18 +11,18 @@ abstract class RssCollectorTriggerSupport(
 
     protected fun runWithDuration() {
         val startAt = System.currentTimeMillis()
-        log.info("[${this.javaClass.simpleName}] Starting collection")
+        log.info("Starting collection")
 
         try {
             collector.execute()
             val elapsedMs = System.currentTimeMillis() - startAt
             log.info(
-                "[${this.javaClass.simpleName}] Finished collection, elapsedMs=$elapsedMs",
+                "Finished collection, elapsedMs=$elapsedMs",
             )
         } catch (ex: Throwable) {
             val elapsedMs = System.currentTimeMillis() - startAt
             log.error(
-                "[${this.javaClass.simpleName}] Failed collection, elapsedMs=$elapsedMs",
+                "Failed collection, elapsedMs=$elapsedMs",
                 ex
             )
             throw RssCollectionExecutionException(
