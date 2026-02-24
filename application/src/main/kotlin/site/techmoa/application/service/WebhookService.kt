@@ -13,6 +13,10 @@ class WebhookService(
 
     @Transactional
     fun save(platform: WebhookPlatform, url: String): Webhook {
-        return saveWebhookUseCase.save(platform = platform, url = url)
+        val newWebhook = Webhook.of(
+            platform = platform,
+            url = url,
+        )
+        return saveWebhookUseCase.save(newWebhook)
     }
 }
