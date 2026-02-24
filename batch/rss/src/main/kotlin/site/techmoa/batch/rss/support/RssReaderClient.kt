@@ -24,9 +24,8 @@ class RssReaderClient(
     private val articleLinkManager: ArticleLinkManager,
 ) : RssClient {
 
-    private val rssReader = RssReader().addFeedFilter(CustomInvalidXmlCharacterFilter()) as RssReader
-
     override fun fetch(blog: Blog): List<Article> {
+        val rssReader = RssReader().addFeedFilter(CustomInvalidXmlCharacterFilter()) as RssReader
         val rawItems = rssReader.read(blog.rssLink)
             .toList()
         val items = rawItems.map { toItem(it, blog) }
