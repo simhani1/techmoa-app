@@ -10,8 +10,5 @@ spring:
       &useServerPrepStmts=true
       &serverTimezone=Asia/Seoul
       &characterEncoding=UTF-8
-      &profileSQL=true
-      &logger=com.mysql.cj.log.Slf4JLogger
-      &maxQuerySizeToLog=8192
     username: root
     password: root
