@@ -10,7 +10,7 @@ data class Webhook(
         fun of(
             id: Long = 0,
             url: String,
-            validity: WebhookValidity = WebhookValidity.INVALID,
+            validity: WebhookValidity = WebhookValidity.VALID,
             platform: WebhookPlatform
         ): Webhook {
             return Webhook(
