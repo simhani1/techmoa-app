@@ -490,12 +490,70 @@ Content-Type: application/json
 
 ---
 
+## 6) GET `/v1/blogs`
+
+### 설명
+활성 블로그 전체 목록 조회
+
+### 요청
+
+- Method: `GET`
+- Path: `/v1/blogs`
+
+#### 예시
+
+```http
+GET /v1/blogs HTTP/1.1
+Host: api.example.com
+```
+
+### 응답
+
+#### 200 Success
+
+```json
+{
+  "resultType": "SUCCESS",
+  "data": [
+    {
+      "order": 1,
+      "link": "https://blog-a.example.com",
+      "name": "A Blog"
+    },
+    {
+      "order": 2,
+      "link": "https://blog-b.example.com",
+      "name": "B Blog"
+    }
+  ],
+  "errorMessage": null
+}
+```
+
+### 정렬/필드 규칙
+
+- `name` 오름차순으로 정렬되어 응답됩니다.
+- `order`는 정렬된 결과의 순번이며 현재 구현은 `1`부터 시작합니다.
+
+### 예외 케이스
+
+- 현재 본 엔드포인트 경로 상 비즈니스 예외(`DomainException`)를 직접 던지지 않음
+- 기본 동작은 `200` 또는(예외 미처리 시) 시스템 500 가능성
+
+### 프론트 연동 포인트
+
+- `order`는 이미 1-based 순번으로 내려오므로 프론트에서 별도 보정 없이 표시할 수 있습니다.
+- 서버 정렬 기준은 `name` 기준이므로, 추가 정렬이 필요하면 클라이언트 정렬 정책을 명시적으로 분리하세요.
+
+---
+
 ## 연동 체크리스트 (프론트 우선)
 
 - `GET /v1/articles`는 `nextCursor` 기준으로 다음 페이지를 호출
 - 에러 시 응답은 항상 HTTP 코드만 보는 대신 `resultType=ERROR`와 `errorMessage.code`를 함께 판별
 - OAuth 성공 응답은 바디보다 `Set-Cookie` 헤더의 존재를 우선 확인
 - `/v1/webhooks`의 유효성 실패는 요청 400+`errorMessage.code`로 즉시 사용자 피드백
+- `/v1/blogs`의 `order`는 1-based 순번으로 내려오므로 그대로 표시 가능
 - `NOT_FOUND_DATA`는 대부분 경로 파라미터(`articleId`) 잘못/삭제된 데이터 케이스로 처리
 
 ## 파일 위치
