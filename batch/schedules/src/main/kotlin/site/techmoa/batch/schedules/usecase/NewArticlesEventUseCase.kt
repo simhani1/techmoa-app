@@ -7,8 +7,8 @@ import site.techmoa.batch.schedules.dto.NewArticleDto
 import site.techmoa.domain.event.OutboxMessages
 import site.techmoa.domain.event.OutboxMessages.NewArticlesOutboxMessage
 import site.techmoa.domain.model.Webhook
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 @Component
 class NewArticlesEventUseCase(
@@ -27,7 +27,7 @@ class NewArticlesEventUseCase(
                 messages.add(
                     NewArticlesOutboxMessage(
                         aggregateId = article.articleId,
-                        idempotencyKey = idempotencyKey(article.articleId, webhook.id),
+                        idempotencyKey = idempotencyKey(),
                         payload = objectMapper.writeValueAsString(
                             NewArticlesOutboxMessage.OutboxPayload(
                                 articleId = article.articleId,
@@ -45,11 +45,7 @@ class NewArticlesEventUseCase(
         eventPublisher.publishEvent(OutboxMessages(messages))
     }
 
-    private fun idempotencyKey(
-        articleId: Long,
-        webhookId: Long
-    ): String {
-        val eventTime = LocalDateTime.now().format(dateTimeFormatter)
-        return "${eventTime}:article:${articleId}:webhook:${webhookId}"
+    private fun idempotencyKey(): String {
+        return UUID.randomUUID().toString()
     }
 }
