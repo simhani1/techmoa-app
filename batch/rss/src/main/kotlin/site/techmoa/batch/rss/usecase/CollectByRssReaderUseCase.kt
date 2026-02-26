@@ -62,10 +62,10 @@ class CollectByRssReaderUseCase(
         val failures = AtomicInteger(0)
 
         val futures = blogs.map { blog ->
-            CompletableFuture.supplyAsync({ fetchSingleBlog(blog, failures) }, fetchExecutor)
-                .whenComplete { _, ex ->
-                    log.info("Future done blogId={}", blog.id)
-                }
+            CompletableFuture.supplyAsync(
+                { fetchSingleBlog(blog, failures) },
+                fetchExecutor
+            )
         }
 
         CompletableFuture.allOf(*futures.toTypedArray()).join()
