@@ -3,7 +3,6 @@ package site.techmoa.batch.schedules.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.slf4j.LoggerFactory
-import org.springframework.boot.actuate.metrics.MetricsEndpoint
 import org.springframework.stereotype.Service
 import site.techmoa.batch.schedules.repository.ArticleRepository
 import site.techmoa.batch.schedules.repository.OutboxRepository
@@ -17,7 +16,6 @@ class OutboxDispatchService(
     private val articleRepository: ArticleRepository,
     private val webhookRepository: WebhookRepository,
     private val webhookGatewayPort: WebhookGatewayPort,
-    private val metricsEndpoint: MetricsEndpoint,
     private val objectMapper: ObjectMapper
 ) {
 
