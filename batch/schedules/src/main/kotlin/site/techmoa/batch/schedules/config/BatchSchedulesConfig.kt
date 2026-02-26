@@ -15,10 +15,10 @@ class BatchSchedulesConfig {
     @Bean("schedulesTaskScheduler")
     fun schedulesTaskScheduler(): ThreadPoolTaskScheduler {
         val scheduler = ThreadPoolTaskScheduler()
-        scheduler.poolSize = 4
-        scheduler.threadNamePrefix = "schedules-"
+        scheduler.poolSize = 2
+        scheduler.threadNamePrefix = "publish-msg-"
         scheduler.setWaitForTasksToCompleteOnShutdown(true)
-        scheduler.setAwaitTerminationSeconds(30)
+        scheduler.setAwaitTerminationSeconds(15)
         scheduler.setErrorHandler { ex ->
             log.error("[BatchSchedulesConfig] Scheduled task execution failed", ex)
         }
