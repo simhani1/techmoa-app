@@ -6,7 +6,7 @@ import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 import site.techmoa.batch.schedules.annotation.EventHandler
 import site.techmoa.batch.schedules.repository.OutboxRepository
-import site.techmoa.domain.event.NewArticlesEvents
+import site.techmoa.domain.event.OutboxMessages
 
 @EventHandler
 class NewArticlesEventHandler(
@@ -15,7 +15,7 @@ class NewArticlesEventHandler(
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     @Transactional(propagation = Propagation.MANDATORY)
-    fun recordMessage(event: NewArticlesEvents) {
-        outboxRepository.save(event)
+    fun recordMessage(messages: OutboxMessages) {
+        outboxRepository.save(messages)
     }
 }

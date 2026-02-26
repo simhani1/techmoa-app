@@ -3,7 +3,7 @@ package site.techmoa.batch.schedules.trigger.support
 import org.slf4j.LoggerFactory
 import site.techmoa.batch.schedules.service.ScanNewArticlesService
 
-abstract class PublishNotificationMessageTriggerSupport(
+abstract class RecordOutboxMessageTriggerSupport(
     private val service: ScanNewArticlesService
 ) {
 
@@ -11,7 +11,7 @@ abstract class PublishNotificationMessageTriggerSupport(
 
     protected fun runWithDuration() {
         val startAt = System.currentTimeMillis()
-        log.info("[{}] Starting notification publish scheduler", this.javaClass.simpleName)
+        log.info("[{}] Starting record outbox message scheduler", this.javaClass.simpleName)
 
         try {
             service.execute()

@@ -4,13 +4,13 @@ import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import site.techmoa.batch.schedules.service.ScanNewArticlesService
-import site.techmoa.batch.schedules.trigger.support.PublishNotificationMessageTriggerSupport
+import site.techmoa.batch.schedules.trigger.support.RecordOutboxMessageTriggerSupport
 
 @Component
 @Profile("prod")
-class ProdPublishNotificationMessageTrigger(
+class ProdRecordOutboxMessageTrigger(
     service: ScanNewArticlesService
-) : PublishNotificationMessageTriggerSupport(service) {
+) : RecordOutboxMessageTriggerSupport(service) {
 
     companion object {
         const val MINUTE_5_AND_35 = "0 5,35 * * * *"
