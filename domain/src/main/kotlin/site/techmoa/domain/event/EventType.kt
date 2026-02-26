@@ -1,5 +1,5 @@
 package site.techmoa.domain.event
 
-enum class EventTag {
+enum class EventType {
     NEW_ARTICLE,
 }

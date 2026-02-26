@@ -12,7 +12,7 @@ class LastScannedArticleRepository(
     private val jdbcTemplate: JdbcTemplate
 ) {
 
-    fun findBy(publishNotificationJob: String): LastScannedArticleDto? {
+    fun findBy(jobName: String): LastScannedArticleDto? {
         val sql = """
             SELECT last_scanned_id
             FROM scheduler_scan_support
@@ -23,7 +23,7 @@ class LastScannedArticleRepository(
             val lastScannedId = jdbcTemplate.queryForObject(
                 sql,
                 Long::class.java,
-                publishNotificationJob
+                jobName
             )
             lastScannedId?.let { LastScannedArticleDto(it) }
         } catch (_: EmptyResultDataAccessException) {

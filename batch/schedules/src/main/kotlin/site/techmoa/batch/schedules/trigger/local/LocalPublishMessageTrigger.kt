@@ -1,4 +1,4 @@
-package site.techmoa.batch.schedules.trigger.prod
+package site.techmoa.batch.schedules.trigger.local
 
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
@@ -7,16 +7,16 @@ import site.techmoa.batch.schedules.service.OutboxDispatchService
 import site.techmoa.batch.schedules.trigger.support.OutboxDispatchMessageTriggerSupport
 
 @Component
-@Profile("prod")
-class ProdOutboxDispatchMessageTrigger(
+@Profile("local")
+class LocalPublishMessageTrigger(
     outboxDispatchService: OutboxDispatchService
 ) : OutboxDispatchMessageTriggerSupport(outboxDispatchService) {
 
     companion object {
-        const val EVERY_HOUR = "0 0 0/1 * * *"
+        const val EVERY_30_SECONDS = "0 0/1 * * * *"
     }
 
-    @Scheduled(cron = EVERY_HOUR, scheduler = "schedulesTaskScheduler")
+    @Scheduled(cron = EVERY_30_SECONDS, scheduler = "schedulesTaskScheduler")
     fun run() {
         runWithDuration()
     }
