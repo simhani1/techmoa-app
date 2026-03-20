@@ -1,6 +1,6 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_URL}:3306/techmoa?useSSL=false&rewriteBatchedStatements=true&cachePrepStmts=true&useServerPrepStmts=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://${DB_URL}:3306/techmoa?useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&cachePrepStmts=true&useServerPrepStmts=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${DB_USER}
     password: ${DB_PASSWORD}
