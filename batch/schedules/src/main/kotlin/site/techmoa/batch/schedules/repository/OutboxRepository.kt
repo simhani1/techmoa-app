@@ -83,7 +83,7 @@ class OutboxRepository(
 
         jdbcTemplate.update(
             sql,
-            OutboxStatus.FAILED.name,
+            OutboxStatus.FAIL.name,
             errorMessage,
             outboxId
         )
