@@ -4,5 +4,5 @@ enum class OutboxStatus {
     PENDING,
     PUBLISHING,
     SUCCESS,
-    FAILED
+    FAIL,
 }
