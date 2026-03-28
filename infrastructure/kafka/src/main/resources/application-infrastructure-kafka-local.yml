@@ -1,0 +1,16 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092 # 필수: Kafka 브로커 주소
+
+    producer:
+      acks: all # 권장
+      properties:
+        enable.idempotence: true # 권장: 중복 발행 방지
+        linger.ms: 10 # 선택: 배치 지연 시간
+        delivery.timeout.ms: 30000 # 선택: 전송 타임아웃
+
+    consumer:
+      group-id: webhook-discord-local # 필수: subscriber consumer group
+      auto-offset-reset: earliest # 선택: offset이 없을 때 처음부터 읽기
+      enable-auto-commit: false # 권장: retry/DLT 처리 시 자동 커밋 비활성화
+      max-poll-records: 10 # 선택: 한 번에 읽을 최대 레코드 수

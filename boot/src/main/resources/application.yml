@@ -14,11 +14,13 @@ spring:
         - infrastructure-mysql-local
         - infrastructure-jwt-local
         - infrastructure-jpa-local
+        - infrastructure-kafka-local
       prod:
         - prod
         - infrastructure-mysql-prod
         - infrastructure-jwt-prod
         - infrastructure-jpa-prod
+        - infrastructure-kafka-prod
 
 management:
   endpoints:
