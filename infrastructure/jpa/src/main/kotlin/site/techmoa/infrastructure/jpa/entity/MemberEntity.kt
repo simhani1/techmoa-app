@@ -25,5 +25,11 @@ class MemberEntity(
     val provider: OauthProvider,
 
     @Column(name = "subject", nullable = false, length = 64)
-    val subject: String
+    val subject: String,
+
+    @Column(name = "login_id", nullable = true, length = 50)
+    val loginId: String? = null,
+
+    @Column(name = "password", nullable = true, length = 100)
+    val password: String? = null,
 ) : BaseEntity()
