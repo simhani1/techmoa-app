@@ -6,4 +6,7 @@ dependencies {
 
     // Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
     implementation("io.jsonwebtoken:jjwt:${jwtVersion}")
+
+    // BCryptPasswordEncoder
+    implementation("org.springframework.security:spring-security-crypto")
 }

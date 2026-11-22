@@ -31,6 +31,11 @@ class KidNotMatchException(
     override val cause: Throwable? = null,
 ) : DomainException(ErrorCode.KID_NOT_MATCH, message, cause)
 
+class DuplicatedLoginIdException(
+    override val message: String,
+    override val cause: Throwable? = null,
+) : DomainException(ErrorCode.DUPLICATED_LOGIN_ID, message, cause)
+
 class DuplicatedWebhookException(
     override val message: String,
     override val cause: Throwable? = null,

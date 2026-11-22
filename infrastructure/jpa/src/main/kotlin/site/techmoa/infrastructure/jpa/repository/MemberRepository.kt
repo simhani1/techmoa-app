@@ -9,4 +9,6 @@ import site.techmoa.infrastructure.jpa.entity.MemberEntity
 interface MemberRepository : JpaRepository<MemberEntity, Long> {
     @Query("SELECT m FROM MemberEntity m WHERE m.provider = :provider and m.subject = :subject")
     fun findByProviderAndSubjectOrNull(@Param("provider") provider: OauthProvider, @Param("subject") subject: String): MemberEntity?
+
+    fun existsByLoginId(loginId: String): Boolean
 }

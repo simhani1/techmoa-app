@@ -16,6 +16,9 @@ enum class ErrorCode{
     // OIDC
     KID_NOT_MATCH,
 
+    // MEMBER
+    DUPLICATED_LOGIN_ID,
+
     // WEBHOOK
     DUPLICATED_WEBHOOK,
     INVALID_WEBHOOK_PLATFORM,

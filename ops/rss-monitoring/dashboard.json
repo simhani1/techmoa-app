@@ -1,0 +1,184 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_LOKI",
+      "label": "Loki",
+      "type": "datasource",
+      "pluginId": "loki",
+      "pluginName": "Loki"
+    }
+  ],
+  "title": "테크모아 RSS와 알림 발송",
+  "uid": "techmoa-rss",
+  "schemaVersion": 39,
+  "version": 2,
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "refresh": "1m",
+  "panels": [
+    {
+      "id": 1,
+      "title": "선택 기간에 실패한 블로그 · 실패 횟수",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "${DS_LOKI}"
+          },
+          "expr": "sum by (blog_id, blog_name) (count_over_time({job=\"techmoa-rss\"} |= \"rss_fetch outcome=failure \" | pattern `rss_fetch outcome=<outcome> duration_ms=<duration_ms> blog_id=<blog_id> blog_name=<blog_name>` | __error__=\"\" [$__range]))",
+          "queryType": "instant",
+          "maxLines": 48
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "blog_id": "블로그 ID",
+              "blog_name": "블로그",
+              "Value": "실패 횟수"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "피드별 평균 수집 시간 · 성공 및 실패 시도 포함",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "${DS_LOKI}"
+          },
+          "expr": "avg_over_time({job=\"techmoa-rss\"} |= \"rss_fetch \" | pattern `rss_fetch outcome=<outcome> duration_ms=<duration_ms> blog_id=<blog_id> blog_name=<blog_name>` | unwrap duration_ms | __error__=\"\" [$__range]) by (blog_id, blog_name)",
+          "queryType": "instant",
+          "maxLines": 48
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "blog_id": "블로그 ID",
+              "blog_name": "블로그",
+              "Value": "평균 수집 시간"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 1
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "title": "수집 회차별 전체 · 성공 · 실패",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "${DS_LOKI}"
+          },
+          "expr": "{job=\"techmoa-rss\"} |= \"RSS collect finished.\" | pattern `<_>RSS collect finished. <summary>` | line_format `{{.summary}}`",
+          "queryType": "range",
+          "maxLines": 48
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 4,
+      "title": "최근 24시간 발송 성공 건수",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "${DS_LOKI}"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "${DS_LOKI}"
+          },
+          "expr": "sum(sum_over_time({job=\"techmoa-rss\"} |= \"webhook_sent \" | pattern `webhook_sent platform=<platform> count=<count>` | unwrap count | __error__=\"\" [24h]))",
+          "queryType": "instant",
+          "maxLines": 48
+        }
+      ],
+      "description": "조회 종료 시각 직전 24시간. 성공 상태를 DB에 기록한 발송 요청을 집계합니다. 로그가 없으면 데이터 없음으로 표시합니다."
+    }
+  ]
+}

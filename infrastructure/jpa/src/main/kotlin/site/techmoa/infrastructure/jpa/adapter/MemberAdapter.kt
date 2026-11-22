@@ -51,4 +51,29 @@ class MemberAdapter(
             )
         }
     }
+
+    @Transactional(readOnly = true)
+    override fun existsByLoginId(loginId: String): Boolean {
+        return memberRepository.existsByLoginId(loginId)
+    }
+
+    @Transactional
+    override fun saveLocal(loginId: String, encodedPassword: String): Member {
+        return memberRepository.save(
+            MemberEntity(
+                email = "",
+                provider = OauthProvider.LOCAL,
+                subject = loginId,
+                loginId = loginId,
+                password = encodedPassword,
+            )
+        ).let {
+            Member(
+                id = it.id,
+                email = it.email,
+                provider = it.provider,
+                subject = it.subject,
+            )
+        }
+    }
 }
