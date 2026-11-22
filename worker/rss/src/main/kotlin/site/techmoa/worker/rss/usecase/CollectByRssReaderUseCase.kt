@@ -12,7 +12,7 @@ import site.techmoa.worker.rss.support.RssClient
 import site.techmoa.worker.rss.trigger.CollectRssUseCase
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.TimeUnit
 
 @Component
 class CollectByRssReaderUseCase(
@@ -23,6 +23,8 @@ class CollectByRssReaderUseCase(
 ) : CollectRssUseCase {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
+
+    private val operations = LoggerFactory.getLogger("techmoa.operations")
 
     private data class FetchResult(
         val blogId: Long,
@@ -59,11 +61,10 @@ class CollectByRssReaderUseCase(
 
     private fun fetchAllFeeds(blogs: List<Blog>): List<FetchResult> {
         val total = blogs.size
-        val failures = AtomicInteger(0)
 
         val futures = blogs.map { blog ->
             CompletableFuture.supplyAsync(
-                { fetchSingleBlog(blog, failures) },
+                { fetchSingleBlog(blog) },
                 fetchExecutor
             )
         }
@@ -71,18 +72,17 @@ class CollectByRssReaderUseCase(
         CompletableFuture.allOf(*futures.toTypedArray()).join()
 
         val results = futures.map { it.join() }
-        log.info(
-            "RSS collect finished. total=$total, success=${total - failures.get()}, failed=${failures.get()}",
-        )
+        val failed = results.count { it.error != null }
+        operations.info("RSS collect finished. total={}, success={}, failed={}", total, total - failed, failed)
 
         return results
     }
 
     private fun fetchSingleBlog(
         blog: Blog,
-        failures: AtomicInteger,
     ): FetchResult {
-        return try {
+        val started = System.nanoTime()
+        val result = try {
             FetchResult(
                 blogId = blog.id,
                 blogName = blog.name,
@@ -90,7 +90,6 @@ class CollectByRssReaderUseCase(
                 error = null,
             )
         } catch (ex: Throwable) {
-            failures.incrementAndGet()
             log.warn(
                 "Failed to collect RSS. blogId=${blog.id}, blogName=${blog.name}",
                 ex,
@@ -102,5 +101,10 @@ class CollectByRssReaderUseCase(
                 error = ex,
             )
         }
+        val durationMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started)
+        val outcome = if (result.error == null) "success" else "failure"
+        operations.info("rss_fetch outcome={} duration_ms={} blog_id={} blog_name={}",
+            outcome, durationMs, blog.id, blog.name)
+        return result
     }
 }

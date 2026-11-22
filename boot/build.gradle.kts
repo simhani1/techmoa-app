@@ -16,5 +16,6 @@ dependencies {
     implementation(project(":infrastructure:mysql"))
 
     implementation("org.springframework.boot:spring-boot-starter")
+    runtimeOnly("com.github.loki4j:loki-logback-appender:2.0.2")
     testRuntimeOnly("com.h2database:h2")
 }

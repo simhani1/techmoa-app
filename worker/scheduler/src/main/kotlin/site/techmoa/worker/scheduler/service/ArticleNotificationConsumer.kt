@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import site.techmoa.domain.event.forPlatform
 import site.techmoa.domain.model.WebhookPlatform
 import org.springframework.stereotype.Service
+import org.slf4j.LoggerFactory
 import site.techmoa.domain.event.ArticleNotification
 import site.techmoa.domain.event.WebhookRateLimited
 import site.techmoa.domain.event.WebhookSender
@@ -16,6 +17,8 @@ class ArticleNotificationConsumer(
     private val senders: List<WebhookSender>,
     private val mapper: ObjectMapper,
 ) {
+    private val operations = LoggerFactory.getLogger("techmoa.operations")
+
     fun sendPendingNotifications() {
         val pausedPlatforms = mutableSetOf<WebhookPlatform>()
         for (destination in repository.findReadyDestinations()) {
@@ -48,6 +51,9 @@ class ArticleNotificationConsumer(
                 }
             }
             repository.recordDeliveryResults(destination, sentOutboxIds, failureReasonsByOutboxId, rateLimit)
+            if (sentOutboxIds.isNotEmpty()) {
+                operations.info("webhook_sent platform={} count={}", destination.platform, sentOutboxIds.size)
+            }
             if (rateLimit != null) return rateLimit
         }
         return null
