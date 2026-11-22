@@ -14,7 +14,7 @@ import site.techmoa.domain.event.WebhookSender
 import site.techmoa.worker.scheduler.repository.OutboxRepository
 import site.techmoa.worker.scheduler.repository.OutboxRepository.PendingDelivery
 
-class OutboxDispatchServiceTest : BehaviorSpec({
+class ArticleNotificationConsumerTest : BehaviorSpec({
     for (global in listOf(false, true)) {
         val scope = if (global) "전역" else "개별"
         Given("두 번째 글에서 $scope 제한이 발생하면") {
@@ -37,7 +37,7 @@ class OutboxDispatchServiceTest : BehaviorSpec({
                 every { repository.findPendingDeliveries(third) } returnsMany listOf(listOf(delivery(5)), emptyList())
                 every { sender.publish(article(2)) } throws rateLimit
 
-                OutboxDispatchService(repository, listOf(sender, slackSender), mapper).dispatchPending()
+                ArticleNotificationConsumer(repository, listOf(sender, slackSender), mapper).sendPendingNotifications()
 
                 verify(exactly = 1) { repository.recordDeliveryResults(first, listOf(1L), emptyMap(), rateLimit) }
                 verify(exactly = 1) { slackSender.publish(article(5)) }

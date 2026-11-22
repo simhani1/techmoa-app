@@ -9,14 +9,14 @@ import site.techmoa.worker.scheduler.repository.WebhookRepository
 import site.techmoa.worker.scheduler.usecase.LastScannedArticleUseCase
 
 @Service
-class ScanNewArticlesService(
+class ArticleNotificationProducer(
     private val lastScannedArticleUseCase: LastScannedArticleUseCase,
     private val outboxRepository: OutboxRepository,
     private val articleRepository: ArticleRepository,
     private val webhookRepository: WebhookRepository,
 ) {
     @Transactional
-    fun execute() {
+    fun enqueueNewArticleNotifications() {
         val lastScanned = lastScannedArticleUseCase.getLastScannedArticle()
         val newArticles = articleRepository.findByIdGreaterThan(lastScanned.articleId)
         if (newArticles.isEmpty()) return

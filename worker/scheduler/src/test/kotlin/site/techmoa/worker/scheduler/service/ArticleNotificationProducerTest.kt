@@ -12,7 +12,7 @@ import site.techmoa.worker.scheduler.repository.*
 import site.techmoa.worker.scheduler.usecase.LastScannedArticleUseCase
 import java.time.LocalDateTime
 
-class ScanNewArticlesServiceTest : BehaviorSpec({
+class ArticleNotificationProducerTest : BehaviorSpec({
     Given("같은 글을 받을 웹훅의 등록 시점이 다를 때") {
         Then("등록 이후 저장된 글만 목적지별로 기록하고 확인 위치를 갱신한다") {
             val start = LocalDateTime.of(2026, 1, 1, 10, 0)
@@ -30,7 +30,7 @@ class ScanNewArticlesServiceTest : BehaviorSpec({
                 RegisteredWebhook(20, "https://example.org/b", start.plusNanos(1000), WebhookPlatform.DISCORD),
             )
 
-            ScanNewArticlesService(cursor, outbox, articleRepository, webhookRepository).execute()
+            ArticleNotificationProducer(cursor, outbox, articleRepository, webhookRepository).enqueueNewArticleNotifications()
 
             val firstWebhook = slot<List<ArticleNotification>>()
             val secondWebhook = slot<List<ArticleNotification>>()

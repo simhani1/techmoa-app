@@ -11,21 +11,21 @@ import site.techmoa.domain.event.WebhookSender
 import site.techmoa.worker.scheduler.repository.OutboxRepository
 
 @Service
-class OutboxDispatchService(
+class ArticleNotificationConsumer(
     private val repository: OutboxRepository,
     private val senders: List<WebhookSender>,
     private val mapper: ObjectMapper,
 ) {
-    fun dispatchPending() {
+    fun sendPendingNotifications() {
         val pausedPlatforms = mutableSetOf<WebhookPlatform>()
         for (destination in repository.findReadyDestinations()) {
             if (destination.platform in pausedPlatforms) continue
-            val rateLimit = dispatchWebhook(destination)
+            val rateLimit = sendPendingForWebhook(destination)
             if (rateLimit?.global == true) pausedPlatforms.add(destination.platform)
         }
     }
 
-    private fun dispatchWebhook(destination: OutboxRepository.Destination): WebhookRateLimited? {
+    private fun sendPendingForWebhook(destination: OutboxRepository.Destination): WebhookRateLimited? {
         while (!Thread.currentThread().isInterrupted) {
             val pendingDeliveries = repository.findPendingDeliveries(destination)
             if (pendingDeliveries.isEmpty()) return null

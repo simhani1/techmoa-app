@@ -1,10 +1,10 @@
 package site.techmoa.worker.scheduler.trigger.support
 
 import org.slf4j.LoggerFactory
-import site.techmoa.worker.scheduler.service.ScanNewArticlesService
+import site.techmoa.worker.scheduler.service.ArticleNotificationProducer
 
-abstract class RecordOutboxMessageTriggerSupport(
-    private val service: ScanNewArticlesService
+abstract class NotificationProducerTriggerSupport(
+    private val producer: ArticleNotificationProducer
 ) {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
@@ -14,7 +14,7 @@ abstract class RecordOutboxMessageTriggerSupport(
         log.info("[{}] Starting record outbox message scheduler", this.javaClass.simpleName)
 
         try {
-            service.execute()
+            producer.enqueueNewArticleNotifications()
             val elapsedMs = System.currentTimeMillis() - startAt
             log.info("[{}] Finished scheduler, elapsedMs={}", this.javaClass.simpleName, elapsedMs)
         } catch (ex: Throwable) {
