@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 
@@ -28,13 +27,9 @@ class BatchRssConfig {
     }
 
     @Bean("rssFetchExecutor", destroyMethod = "close")
-    fun rssFetchExecutor(
-        @Value("\${techmoa.rss.max-concurrent-fetches:4}") maxConcurrentFetches: Int,
-    ): SimpleAsyncTaskExecutor {
-        require(maxConcurrentFetches > 0) { "techmoa.rss.max-concurrent-fetches must be positive" }
+    fun rssFetchExecutor(): SimpleAsyncTaskExecutor {
         val executor = SimpleAsyncTaskExecutor("rss-fetch-")
         executor.setVirtualThreads(true)
-        executor.concurrencyLimit = maxConcurrentFetches
         executor.setTaskTerminationTimeout(30_000)
         return executor
     }

@@ -39,7 +39,7 @@ class CollectByRssReaderUseCase(
 
         // 2. 각 블로그 RSS에서 아티클 수집
         log.info("Start Collecting Articles from RSS")
-        val results = fetchWithLimitedConcurrency(blogs)
+        val results = fetchAllFeeds(blogs)
 
         val articles = results
             .filter { it.error == null }
@@ -57,7 +57,7 @@ class CollectByRssReaderUseCase(
         articlePort.saveAllIgnoringDuplicates(articles)
     }
 
-    private fun fetchWithLimitedConcurrency(blogs: List<Blog>): List<FetchResult> {
+    private fun fetchAllFeeds(blogs: List<Blog>): List<FetchResult> {
         val total = blogs.size
         val failures = AtomicInteger(0)
 
