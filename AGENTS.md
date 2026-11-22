@@ -9,6 +9,7 @@
 - If required template fields are missing, ask concise follow-up questions before implementing tests.
 
 ## Release tracking
+- 기능, 버그 수정, 배포 핫픽스 PR의 대상은 `develop`으로 지정한다. `main`에는 `develop`에서 여는 릴리스 PR로 반영한다. PR 생성 후 대상 브랜치를 확인한다.
 - 새 작업 이슈를 등록할 때 대상 버전의 릴리스 이슈를 GitHub의 부모 이슈로 지정한다. 버전이 정해지지 않았다면 먼저 대상 버전을 확인한다.
 - 배포 전에는 릴리스 PR의 변경 사항과 하위 이슈를 대조한다. 미포함 작업은 다음 대상 릴리스로 옮긴다.
 - 릴리스 PR 본문에 `Closes #릴리스이슈번호`를 적는다. main 병합 직후 포함된 하위 이슈와 릴리스 이슈의 종료 상태를 확인하고, 열려 있으면 해당 PR을 참조해 닫는다.
