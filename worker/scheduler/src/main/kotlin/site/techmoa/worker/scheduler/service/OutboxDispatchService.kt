@@ -2,46 +2,39 @@ package site.techmoa.worker.scheduler.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.support.TransactionTemplate
 import site.techmoa.domain.event.OutboxMessages.NewArticlesOutboxMessage.OutboxPayload
-import site.techmoa.domain.event.WebhookMessageBroker
-import site.techmoa.worker.scheduler.repository.ArticleRepository
+import site.techmoa.domain.event.WebhookRateLimited
+import site.techmoa.domain.event.WebhookSender
 import site.techmoa.worker.scheduler.repository.OutboxRepository
-import site.techmoa.worker.scheduler.repository.WebhookRepository
 
 @Service
 class OutboxDispatchService(
-    private val outboxRepository: OutboxRepository,
-    private val articleRepository: ArticleRepository,
-    private val webhookRepository: WebhookRepository,
-    private val messageBroker: WebhookMessageBroker,
-    private val objectMapper: ObjectMapper
+    private val repository: OutboxRepository,
+    private val sender: WebhookSender,
+    private val mapper: ObjectMapper,
+    private val transaction: TransactionTemplate,
 ) {
-
-    private val log = LoggerFactory.getLogger(javaClass)
-
     fun dispatchPending() {
-        val pendingMessages = outboxRepository.claimPending()
-        if (pendingMessages.isEmpty()) return
-
-        pendingMessages.forEach { message ->
-            try {
-                val json = message.payload
-                val payload = objectMapper.readValue<OutboxPayload>(json)
-                messageBroker.publish(payload)
-                outboxRepository.markSuccess(message.outboxMessageId)
-            } catch (ex: Exception) {
-                log.error(
-                    "Failed to publish outbox message. outboxMessageId={}",
-                    message.outboxMessageId,
-                    ex
-                )
-                outboxRepository.markFailed(
-                    message.outboxMessageId,
-                    ex.message?.take(1000) ?: "Unknown error"
-                )
-            }
+        var preferredWebhook: Long? = null
+        while (!Thread.currentThread().isInterrupted) {
+            preferredWebhook = transaction.execute {
+                if (!repository.acquireDispatcher()) return@execute null
+                val delivery = repository.nextDelivery(preferredWebhook) ?: return@execute null
+                try {
+                    sender.publish(mapper.readValue<OutboxPayload>(delivery.payload))
+                } catch (limit: WebhookRateLimited) {
+                    repository.defer(delivery.webhookId, limit.delayMillis, limit.global)
+                    return@execute delivery.webhookId
+                } catch (ex: Exception) {
+                    // Exception messages from the HTTP client can contain the webhook token.
+                    repository.markFailed(delivery.id, ex.javaClass.simpleName)
+                    return@execute delivery.webhookId
+                }
+                repository.markSuccess(delivery.id)
+                delivery.webhookId
+            } ?: return
         }
     }
 }

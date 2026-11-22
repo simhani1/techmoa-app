@@ -5,9 +5,8 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import site.techmoa.domain.event.OutboxMessages
 import site.techmoa.domain.event.OutboxMessages.NewArticlesOutboxMessage
-import site.techmoa.domain.model.Webhook
+import site.techmoa.worker.scheduler.repository.RegisteredWebhook
 import site.techmoa.worker.scheduler.dto.NewArticleDto
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Component
@@ -16,16 +15,13 @@ class NewArticlesEventUseCase(
     private val eventPublisher: ApplicationEventPublisher
 ) {
 
-    companion object {
-        private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-    }
-
-    fun publish(newArticles: List<NewArticleDto>, webhooks: List<Webhook>) {
+    fun publish(newArticles: List<NewArticleDto>, webhooks: List<RegisteredWebhook>) {
         val messages = arrayListOf<NewArticlesOutboxMessage>()
         webhooks.forEach { webhook ->
-            newArticles.forEach { article ->
+            newArticles.filter { it.storedAt > webhook.registeredAt }.forEach { article ->
                 messages.add(
                     NewArticlesOutboxMessage(
+                        webhookId = webhook.id,
                         aggregateId = article.articleId,
                         idempotencyKey = idempotencyKey(),
                         payload = objectMapper.writeValueAsString(
@@ -42,7 +38,7 @@ class NewArticlesEventUseCase(
                 )
             }
         }
-        eventPublisher.publishEvent(OutboxMessages(messages))
+        if (messages.isNotEmpty()) eventPublisher.publishEvent(OutboxMessages(messages))
     }
 
     private fun idempotencyKey(): String {

@@ -13,7 +13,6 @@ dependencies {
     implementation(project(":infrastructure:oauth"))
     implementation(project(":infrastructure:jpa"))
     implementation(project(":infrastructure:rest"))
-    implementation(project(":infrastructure:kafka"))
     implementation(project(":infrastructure:mysql"))
 
     implementation("org.springframework.boot:spring-boot-starter")

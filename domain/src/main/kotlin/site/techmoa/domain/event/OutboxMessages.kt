@@ -9,6 +9,7 @@ data class OutboxMessages(
         val aggregateType: String = "ARTICLE",      // e.g. "article"
         val aggregateId: Long,        // e.g. articleId.toString()
         val idempotencyKey: String,
+        val webhookId: Long,
         val payloadType: String = "application/json",
         val payload: String,
         val status: OutboxStatus = OutboxStatus.PENDING,

@@ -1,6 +1,11 @@
 package site.techmoa.infrastructure.rest
 
-import org.slf4j.LoggerFactory
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.web.reactive.function.client.WebClientResponseException
+import site.techmoa.domain.event.WebhookSender
+import site.techmoa.domain.event.WebhookRateLimited
+import java.time.Duration
+import kotlin.math.ceil
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -12,28 +17,31 @@ import java.time.format.DateTimeFormatter
 
 @Component
 class DiscordClient(
-    webClient: WebClient.Builder
-) {
-
-    private val log = LoggerFactory.getLogger(javaClass)
+    webClient: WebClient.Builder,
+    private val mapper: ObjectMapper
+) : WebhookSender {
     private val discordClient = webClient.build()
 
-    fun post(message: OutboxPayload) {
-        val payload = toDiscordPayload(message)
-        val response = discordClient.post()
-            .uri(message.webhookUrl)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(payload)
-            .retrieve()
-            .toBodilessEntity()
-            .block()
-
-        if (response == null || !response.statusCode.is2xxSuccessful) {
-            log.error("Webhook publishing error. webhookUrl={}, status={}", message.webhookUrl, response?.statusCode)
-            throw IllegalStateException("Failed to publish webhook. webhookUrl=${message.webhookUrl}, status=${response?.statusCode}")
+    override fun publish(message: OutboxPayload) {
+        try {
+            discordClient.post()
+                .uri(message.webhookUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(toDiscordPayload(message))
+                .retrieve()
+                .toBodilessEntity()
+                .block(Duration.ofSeconds(15))
+        } catch (ex: WebClientResponseException.TooManyRequests) {
+            val body = runCatching { mapper.readTree(ex.responseBodyAsString) }.getOrNull()
+            val seconds = listOfNotNull(
+                ex.headers.getFirst("Retry-After")?.toDoubleOrNull(),
+                body?.get("retry_after")?.asDouble(),
+            ).filter { it.isFinite() && it > 0 }.maxOrNull() ?: 1.0
+            val global = ex.headers.getFirst("X-RateLimit-Global") == "true" ||
+                ex.headers.getFirst("X-RateLimit-Scope") == "global" ||
+                body?.get("global")?.asBoolean() == true
+            throw WebhookRateLimited(ceil(seconds * 1000).toLong(), global)
         }
-
-        log.info("Published discord webhook. webhookUrl=${message.webhookUrl}, articleId=${message.articleId}")
     }
 
     private fun toDiscordPayload(message: OutboxPayload): DiscordWebhookPayload {

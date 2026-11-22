@@ -12,10 +12,10 @@ class ArticleRepository(
 
     fun findByIdGreaterThan(articleId: Long): List<site.techmoa.worker.scheduler.dto.NewArticleDto> {
         val sql = """
-            SELECT a.article_id, a.blog_id, a.title, a.link, a.pub_date, b.name
+            SELECT a.created_at, a.article_id, a.blog_id, a.title, a.link, a.pub_date, b.name
             FROM article a
             LEFT JOIN blog b on b.blog_id = a.blog_id
-            WHERE a.article_id > ?;
+            WHERE a.article_id > ? ORDER BY a.article_id;
         """.trimIndent()
 
         return jdbcTemplate.query(
@@ -23,6 +23,7 @@ class ArticleRepository(
             RowMapper { rs, _ ->
                 NewArticleDto(
                     articleId = rs.getLong("article_id"),
+                    storedAt = rs.getTimestamp("created_at").toLocalDateTime(),
                     title = rs.getString("title"),
                     link = rs.getString("link"),
                     pubDate = rs.getLong("pub_date"),

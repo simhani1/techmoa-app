@@ -1,60 +1,16 @@
 package site.techmoa.worker.scheduler.repository
 
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
-import site.techmoa.domain.model.Webhook
-import site.techmoa.domain.model.WebhookPlatform
-import site.techmoa.domain.model.WebhookValidity
+import java.time.LocalDateTime
 
-@Repository(value = "SchedulesWebhookRepository")
-class WebhookRepository(
-    private val jdbcTemplate: JdbcTemplate
-) {
+data class RegisteredWebhook(val id: Long, val url: String, val registeredAt: LocalDateTime)
 
-    private val rowMapper = RowMapper { rs, _ ->
-        Webhook(
-            id = rs.getLong("webhook_id"),
-            url = rs.getString("url"),
-            validity = WebhookValidity.valueOf(rs.getString("validity")),
-            platform = WebhookPlatform.valueOf(rs.getString("platform"))
-        )
-    }
-
-    fun getValidWebhook(): List<Webhook> {
-        return findAllBy(WebhookValidity.VALID)
-    }
-
-    fun findById(webhookId: Long): Webhook? {
-        val sql = """
-            SELECT webhook_id, url, validity, platform
-            FROM webhook
-            WHERE webhook_id = ?
-        """.trimIndent()
-
-        return try {
-            jdbcTemplate.queryForObject(
-                sql,
-                rowMapper,
-                webhookId
-            )
-        } catch (ex: EmptyResultDataAccessException) {
-            null
-        }
-    }
-
-    private fun findAllBy(valid: WebhookValidity): List<Webhook> {
-        val sql = """
-            SELECT webhook_id, url, validity, platform
-            FROM webhook
-            WHERE validity = ?
-        """.trimIndent()
-
-        return jdbcTemplate.query(
-            sql,
-            rowMapper,
-            valid.name
-        )
+@Repository("SchedulesWebhookRepository")
+class WebhookRepository(private val jdbc: JdbcTemplate) {
+    fun getValidWebhook(): List<RegisteredWebhook> = jdbc.query(
+        "SELECT webhook_id, url, subscribed_at FROM webhook WHERE validity = 'VALID'"
+    ) { rs, _ ->
+        RegisteredWebhook(rs.getLong("webhook_id"), rs.getString("url"), rs.getTimestamp("subscribed_at").toLocalDateTime())
     }
 }

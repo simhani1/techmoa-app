@@ -4,9 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.domain.event.EventType
 import site.techmoa.domain.event.OutboxMessages
-import site.techmoa.domain.event.OutboxMessages.NewArticlesOutboxMessage
 import site.techmoa.domain.event.OutboxStatus
 import java.sql.Timestamp
 import java.time.Instant
@@ -16,29 +14,22 @@ class OutboxRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
 
-    data class OutboxMessage(
-        val id: Long,
-        val blogId: Long,
-        val guid: String,
-        val idempotencyKey: String,
-    )
-
     fun save(messages: OutboxMessages) {
         val sql = """
         INSERT INTO outbox_messages (
-            event_type,
+            webhook_id, event_type,
             aggregate_type,
             aggregate_id,
             idempotency_key,
             payload,
             payload_type,
             status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE webhook_id = VALUES(webhook_id)
     """.trimIndent()
 
         val args: List<Array<Any?>> = messages.messages.map { e ->
             arrayOf(
-                e.eventType.name,
+                e.webhookId, e.eventType.name,
                 e.aggregateType,
                 e.aggregateId,
                 e.idempotencyKey,
@@ -72,7 +63,6 @@ class OutboxRepository(
 
     @Transactional
     fun markFailed(outboxId: Long, errorMessage: String) {
-        val now = Timestamp.from(Instant.now())
         val sql = """
             UPDATE outbox_messages
             SET status = ?,
@@ -89,63 +79,52 @@ class OutboxRepository(
         )
     }
 
-    @Transactional
-    fun claimPending(batchSize: Int = 100): List<NewArticlesOutboxMessage> {
-        val pendingMessages = findPending(batchSize)
-        markPublishing(pendingMessages.map { it.outboxMessageId })
-        return pendingMessages
+    data class Delivery(val id: Long, val webhookId: Long, val payload: String)
+
+    // The caller holds this singleton row lock until one bounded HTTP request completes.
+    fun acquireDispatcher(): Boolean = jdbcTemplate.queryForList(
+        """SELECT id FROM webhook_dispatch_clock
+           WHERE id = 1 AND retry_at <= CURRENT_TIMESTAMP(6) FOR UPDATE SKIP LOCKED""",
+        Long::class.java
+    ).isNotEmpty()
+
+    fun nextDelivery(preferredWebhook: Long?): Delivery? {
+        if (preferredWebhook != null) {
+            findPending(preferredWebhook)?.let { return it }
+        }
+        return findPending(null)
     }
 
-    private fun findPending(batchSize: Int): List<NewArticlesOutboxMessage> {
-        val sql = """
-            SELECT
-                outbox_message_id,
-                event_type,
-                aggregate_type,
-                aggregate_id,
-                idempotency_key,
-                payload,
-                payload_type,
-                status,
-                created_at
-            FROM outbox_messages
-            WHERE status = 'PENDING'
-            ORDER BY created_at ASC
-            limit $batchSize
-            FOR UPDATE SKIP LOCKED;
-        """.trimIndent()
+    private fun findPending(webhookId: Long?): Delivery? {
+        val destinationFilter = if (webhookId == null) "" else "AND o.webhook_id = ?"
+        val args = listOfNotNull(webhookId).toTypedArray()
+        return jdbcTemplate.query(
+            """SELECT o.outbox_message_id, o.webhook_id, o.payload
+               FROM outbox_messages o
+               LEFT JOIN webhook_retry r ON r.webhook_id = o.webhook_id
+               WHERE o.status = 'PENDING' AND o.webhook_id IS NOT NULL
+                 $destinationFilter
+                 AND (r.retry_at IS NULL OR r.retry_at <= CURRENT_TIMESTAMP(6))
+               ORDER BY o.outbox_message_id LIMIT 1""",
+            RowMapper { rs, _ -> Delivery(rs.getLong(1), rs.getLong(2), rs.getString(3)) },
+            *args
+        ).firstOrNull()
+    }
 
-        val rowMapper = RowMapper { rs, _ ->
-            NewArticlesOutboxMessage(
-                outboxMessageId = rs.getLong("outbox_message_id"),
-                eventType = EventType.valueOf(rs.getString("event_type")),
-                aggregateType = rs.getString("aggregate_type"),
-                aggregateId = rs.getLong("aggregate_id"),
-                idempotencyKey = rs.getString("idempotency_key"),
-                payload = rs.getString("payload"),
-                payloadType = rs.getString("payload_type"),
-                status = OutboxStatus.valueOf(rs.getString("status"))
+    fun defer(webhookId: Long, delayMillis: Long, global: Boolean) {
+        val micros = Math.multiplyExact(delayMillis, 1000L)
+        if (global) {
+            jdbcTemplate.update(
+                "UPDATE webhook_dispatch_clock SET retry_at = TIMESTAMPADD(MICROSECOND, ?, CURRENT_TIMESTAMP(6)) WHERE id = 1",
+                micros
+            )
+        } else {
+            jdbcTemplate.update(
+                """INSERT INTO webhook_retry (webhook_id, retry_at)
+                   VALUES (?, TIMESTAMPADD(MICROSECOND, ?, CURRENT_TIMESTAMP(6)))
+                   ON DUPLICATE KEY UPDATE retry_at = VALUES(retry_at)""",
+                webhookId, micros
             )
         }
-
-        return jdbcTemplate.query(sql, rowMapper)
-    }
-
-    private fun markPublishing(outboxIds: List<Long>) {
-        val now = Timestamp.from(Instant.now())
-        val sql = """
-            UPDATE outbox_messages
-            SET status = 'PUBLISHING',
-                published_at = ?,
-                last_error_message = NULL
-            WHERE outbox_message_id = ?
-            AND status = 'PENDING'
-        """.trimIndent()
-
-        val args = outboxIds.map { id ->
-            arrayOf(now, id)
-        }
-
-        jdbcTemplate.batchUpdate(sql, args)
     }
 }
