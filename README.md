@@ -63,3 +63,7 @@ graph TD
 ## 모니터링
 
 RSS 수집 시간·실패 블로그·최근 24시간 발송 성공 건수를 Grafana 대시보드로 확인합니다. 설치 절차와 패널 해석은 [ops/rss-monitoring](ops/rss-monitoring/README.md)에 있습니다.
+
+![Grafana RSS 수집 대시보드](docs/images/grafana-rss.png)
+
+![Grafana 알림 발송 및 JVM 대시보드](docs/images/grafana-delivery-jvm.png)
