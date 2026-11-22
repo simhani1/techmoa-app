@@ -1,9 +1,9 @@
 package site.techmoa.domain.event
 
-import site.techmoa.domain.event.OutboxMessages.NewArticlesOutboxMessage.OutboxPayload
+import site.techmoa.domain.event.ArticleNotification
 
 class WebhookRateLimited(val delayMillis: Long, val global: Boolean) : RuntimeException()
 
 interface WebhookSender {
-    fun publish(message: OutboxPayload)
+    fun publish(message: ArticleNotification)
 }

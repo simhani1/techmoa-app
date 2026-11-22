@@ -1,41 +1,41 @@
 package site.techmoa.worker.scheduler.service
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import site.techmoa.domain.event.ArticleNotification
 import site.techmoa.worker.scheduler.repository.ArticleRepository
+import site.techmoa.worker.scheduler.repository.OutboxRepository
 import site.techmoa.worker.scheduler.repository.WebhookRepository
 import site.techmoa.worker.scheduler.usecase.LastScannedArticleUseCase
-import site.techmoa.worker.scheduler.usecase.NewArticlesEventUseCase
 
 @Service
 class ScanNewArticlesService(
     private val lastScannedArticleUseCase: LastScannedArticleUseCase,
-    private val newArticlesEventUseCase: NewArticlesEventUseCase,
+    private val outboxRepository: OutboxRepository,
     private val articleRepository: ArticleRepository,
-    private val webhookRepository: WebhookRepository
+    private val webhookRepository: WebhookRepository,
 ) {
-
-    private val log = LoggerFactory.getLogger(this.javaClass)
-
     @Transactional
     fun execute() {
-        //// BIZ 로직
-        // 1. 마지막 스캔 id 조회
         val lastScanned = lastScannedArticleUseCase.getLastScannedArticle()
-
-        // 2. 새로운 아티클 스캔
         val newArticles = articleRepository.findByIdGreaterThan(lastScanned.articleId)
-        if (newArticles.isEmpty()) return  // 2-1. 제약 ( 새로운 아티클 없으면 중단 )
+        if (newArticles.isEmpty()) return
 
-        // 3. 웹훅 url 조회
-        val webhooks = webhookRepository.getValidWebhook()
-
-        // 4. 마지막 스캔 id 저장
+        for (webhook in webhookRepository.getValidWebhook()) {
+            val notifications = mutableListOf<ArticleNotification>()
+            for (article in newArticles) {
+                if (article.storedAt <= webhook.registeredAt) continue
+                notifications.add(ArticleNotification(
+                    articleId = article.articleId,
+                    title = article.title,
+                    link = article.link,
+                    pubDate = article.pubDate,
+                    blogName = article.blogName,
+                    webhookUrl = webhook.url,
+                ))
+            }
+            if (notifications.isNotEmpty()) outboxRepository.enqueue(webhook.id, notifications)
+        }
         lastScannedArticleUseCase.sync(newArticles.last().articleId)
-        //// BIZ 로직
-
-        // 5. 커밋 직전 아웃박스 테이블 기록 (원자성 보장) -> 별도 유스케이스를 분리하여 Before Commit 이벤트 리슨
-        newArticlesEventUseCase.publish(newArticles, webhooks)
     }
 }

@@ -8,11 +8,11 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import site.techmoa.domain.event.OutboxMessages.NewArticlesOutboxMessage.OutboxPayload
+import site.techmoa.domain.event.ArticleNotification
 import site.techmoa.domain.event.WebhookRateLimited
 
 class DiscordClientTest : BehaviorSpec({
-    val article = OutboxPayload(1, "제목", "https://example.org/article", 0, "블로그", "https://example.org/webhook")
+    val article = ArticleNotification(1, "제목", "https://example.org/article", 0, "블로그", "https://example.org/webhook")
 
     Given("웹훅 응답이 429일 때") {
         fun send(response: ClientResponse): WebhookRateLimited {

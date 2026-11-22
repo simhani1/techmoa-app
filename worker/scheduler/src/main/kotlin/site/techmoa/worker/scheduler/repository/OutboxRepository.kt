@@ -4,46 +4,36 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import site.techmoa.domain.event.OutboxMessages
+import com.fasterxml.jackson.databind.ObjectMapper
+import site.techmoa.domain.event.ArticleNotification
+import java.util.UUID
 import site.techmoa.domain.event.WebhookRateLimited
 
 @Repository(value = "SchedulesOutboxRepository")
 class OutboxRepository(
     private val jdbcTemplate: JdbcTemplate,
+    private val objectMapper: ObjectMapper,
 ) {
 
-    fun save(messages: OutboxMessages) {
-        val sql = """
-        INSERT INTO outbox_messages (
-            webhook_id, event_type,
-            aggregate_type,
-            aggregate_id,
-            idempotency_key,
-            payload,
-            payload_type,
-            status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE webhook_id = VALUES(webhook_id)
-    """.trimIndent()
-
-        val args: List<Array<Any?>> = messages.messages.map { e ->
-            arrayOf(
-                e.webhookId, e.eventType.name,
-                e.aggregateType,
-                e.aggregateId,
-                e.idempotencyKey,
-                e.payload,
-                e.payloadType,
-                e.status.name,
-            )
+    fun enqueue(webhookId: Long, notifications: List<ArticleNotification>) {
+        val rows = notifications.map { notification ->
+            arrayOf<Any>(webhookId, notification.articleId, UUID.randomUUID().toString(),
+                objectMapper.writeValueAsString(notification))
         }
-
-        jdbcTemplate.batchUpdate(sql, args)
+        jdbcTemplate.batchUpdate(
+            """INSERT INTO outbox_messages (
+                   webhook_id, event_type, aggregate_type, aggregate_id,
+                   idempotency_key, payload, payload_type, status
+               ) VALUES (?, 'NEW_ARTICLE', 'ARTICLE', ?, ?, ?, 'application/json', 'PENDING')
+               ON DUPLICATE KEY UPDATE webhook_id = VALUES(webhook_id)""",
+            rows
+        )
     }
 
-    data class Delivery(val id: Long, val payload: String)
+    data class PendingDelivery(val outboxId: Long, val payload: String)
 
     @Transactional(readOnly = true)
-    fun readyWebhooks(): List<Long> = jdbcTemplate.queryForList(
+    fun findReadyWebhookIds(): List<Long> = jdbcTemplate.queryForList(
         """SELECT o.webhook_id FROM outbox_messages o
            LEFT JOIN webhook_retry r ON r.webhook_id = o.webhook_id
            WHERE o.status = 'PENDING' AND o.webhook_id IS NOT NULL
@@ -55,31 +45,31 @@ class OutboxRepository(
     )
 
     @Transactional(readOnly = true)
-    fun pending(webhookId: Long): List<Delivery> = jdbcTemplate.query(
+    fun findPendingDeliveries(webhookId: Long): List<PendingDelivery> = jdbcTemplate.query(
         """SELECT outbox_message_id, payload FROM outbox_messages
            WHERE webhook_id = ? AND status = 'PENDING'
            ORDER BY outbox_message_id LIMIT 20""",
-        RowMapper { rs, _ -> Delivery(rs.getLong(1), rs.getString(2)) },
+        RowMapper { rs, _ -> PendingDelivery(rs.getLong(1), rs.getString(2)) },
         webhookId
     )
 
     @Transactional
-    fun saveResults(webhookId: Long, sent: List<Long>, failures: Map<Long, String>, limit: WebhookRateLimited?) {
-        if (sent.isNotEmpty()) {
-            val placeholders = sent.joinToString { "?" }
+    fun recordDeliveryResults(webhookId: Long, sentOutboxIds: List<Long>, failureReasonsByOutboxId: Map<Long, String>, rateLimit: WebhookRateLimited?) {
+        if (sentOutboxIds.isNotEmpty()) {
+            val placeholders = sentOutboxIds.joinToString { "?" }
             jdbcTemplate.update(
                 """UPDATE outbox_messages SET status = 'SUCCESS', published_at = CURRENT_TIMESTAMP(6),
                    last_error_message = NULL WHERE outbox_message_id IN ($placeholders)""",
-                *sent.toTypedArray()
+                *sentOutboxIds.toTypedArray()
             )
         }
-        if (failures.isNotEmpty()) {
+        if (failureReasonsByOutboxId.isNotEmpty()) {
             jdbcTemplate.batchUpdate(
                 "UPDATE outbox_messages SET status = 'FAIL', last_error_message = ? WHERE outbox_message_id = ?",
-                failures.map { (id, reason) -> arrayOf<Any>(reason, id) }
+                failureReasonsByOutboxId.map { (id, reason) -> arrayOf<Any>(reason, id) }
             )
         }
-        if (limit != null) defer(webhookId, limit.delayMillis, limit.global)
+        if (rateLimit != null) defer(webhookId, rateLimit.delayMillis, rateLimit.global)
     }
 
     private fun defer(webhookId: Long, delayMillis: Long, global: Boolean) {
