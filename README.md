@@ -6,15 +6,20 @@ TechMoa App은 여러 기술 블로그의 RSS를 수집해 아티클을 통합 �
 
 - 여러 기술 블로그 RSS를 가상 스레드로 동시에 수집하고 중복 없이 아티클을 저장합니다.
 - 현재까지 약 1,000개의 블로그 아티클을 볼 수 있습니다.
-- 카카오 OAuth로 회원가입·로그인할 수 있습니다.
-- 웹훅(Discord)을 등록하면 이후 수집된 새 글을 MySQL Outbox를 거쳐 직접 발송합니다. 개별·전역 429 제한이 풀리면 발송을 재개합니다.
+- 웹훅(Discord 등)을 등록하면 이후 수집된 새 글을 MySQL Outbox를 거쳐 직접 발송합니다. 개별·전역 429 제한이 풀리면 발송을 재개합니다.
 - Loki + Grafana로 RSS 수집 결과와 알림 발송 성공 건수를 모니터링합니다.
 
 ## 알림 예시
 
-새 글이 등록되면 아래처럼 Discord 채널로 알림이 전달됩니다.
+새 글이 등록되면 아래처럼 Discord 채널로 알림이 전달됩니다. 지금까지 총 1,637건의 알림을 받았습니다.
 
 ![Discord 알림 예시](docs/images/discord-notification.png)
+
+## 인프라 구조
+
+홈서버(Linux)에 Docker 컨테이너로 배포합니다. GitHub Actions가 이미지를 GHCR에 올리면 self-hosted runner가 받아 배포하고, 앱 로그는 Loki로 수집해 Grafana로 시각화합니다. 새 글 알림은 Discord, Slack 등 웹훅으로 전송합니다. 원본은 [infra.drawio](docs/images/infra.drawio)입니다.
+
+![인프라 구조도](docs/images/infra.png)
 
 ## 멀티모듈 구조
 
@@ -31,7 +36,6 @@ graph TD
 
     infraJpa["infrastructure:jpa<br/>JPA 어댑터 / 엔티티 / 리포지토리"]
     infraMysql["infrastructure:mysql<br/>MySQL / Flyway 마이그레이션"]
-    infraOauth["infrastructure:oauth<br/>카카오 OAuth 어댑터"]
     infraRest["infrastructure:rest<br/>Discord 웹훅 발송"]
 
     presentation --> application
@@ -41,8 +45,6 @@ graph TD
     infraJpa --> application
     infraJpa --> domain
     infraJpa -. runtime .-> infraMysql
-    infraOauth --> application
-    infraOauth --> domain
     infraRest --> domain
 
     workerRss -. runtime .-> infraMysql
@@ -56,7 +58,6 @@ graph TD
     boot --> workerScheduler
     boot --> infraJpa
     boot --> infraMysql
-    boot --> infraOauth
     boot --> infraRest
 ```
 
