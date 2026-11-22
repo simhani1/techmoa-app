@@ -1,0 +1,26 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <root level="INFO"><appender-ref ref="CONSOLE"/></root>
+    <springProfile name="prod">
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <labels>job=techmoa-rss</labels>
+            <structuredMetadata>off</structuredMetadata>
+            <message class="ch.qos.logback.classic.PatternLayout">
+                <pattern>%msg%nopex</pattern>
+            </message>
+            <http>
+                <url>${LOKI_PUSH_URL:-http://loki:3100/loki/api/v1/push}</url>
+            </http>
+            <batch>
+                <timeoutMs>3000</timeoutMs>
+                <sendQueueMaxBytes>4194304</sendQueueMaxBytes>
+                <maxBytes>262144</maxBytes>
+                <drainOnStop>false</drainOnStop>
+            </batch>
+        </appender>
+        <logger name="techmoa.operations" level="INFO">
+            <appender-ref ref="LOKI"/>
+        </logger>
+    </springProfile>
+</configuration>

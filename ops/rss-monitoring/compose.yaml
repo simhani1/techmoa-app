@@ -1,0 +1,15 @@
+services:
+  loki:
+    image: grafana/loki:3.7.10
+    restart: unless-stopped
+    command: -config.file=/etc/loki/rss.yaml
+    volumes:
+      - ./loki.yaml:/etc/loki/rss.yaml:ro
+      - loki-data:/loki
+    networks: [monitor-net]
+
+volumes:
+  loki-data:
+networks:
+  monitor-net:
+    external: true

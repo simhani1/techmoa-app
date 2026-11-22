@@ -5,6 +5,7 @@ import com.apptasticsoftware.rssreader.RssReader
 import org.springframework.stereotype.Component
 import site.techmoa.worker.rss.domain.model.Article
 import site.techmoa.worker.rss.domain.model.Blog
+import java.net.http.HttpClient
 import java.time.ZonedDateTime
 
 /**
@@ -21,11 +22,13 @@ import java.time.ZonedDateTime
  */
 @Component
 class RssReaderClient(
+    private val rssHttpClient: HttpClient,
     private val articleLinkManager: ArticleLinkManager,
 ) : RssClient {
 
     override fun fetch(blog: Blog): List<Article> {
-        val rssReader = RssReader().addFeedFilter(CustomInvalidXmlCharacterFilter()) as RssReader
+        val rssReader = RssReader(rssHttpClient)
+        rssReader.addFeedFilter(CustomInvalidXmlCharacterFilter())
         val rawItems = rssReader.read(blog.rssLink)
             .toList()
         val items = rawItems.map { toItem(it, blog) }
