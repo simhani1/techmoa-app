@@ -31,7 +31,6 @@ include("infrastructure:mysql")
 include("infrastructure:jpa")
 include("infrastructure:oauth")
 include("infrastructure:rest")
-include("infrastructure:kafka")
 
 include("worker")
 include("worker:rss")

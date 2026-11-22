@@ -6,8 +6,6 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import site.techmoa.worker.rss.domain.model.Article
 import site.techmoa.worker.rss.port.ArticlePort
-import java.sql.Timestamp
-import java.time.Instant
 
 @Repository(value = "RssArticleRepository")
 class ArticleRepository(
@@ -18,11 +16,10 @@ class ArticleRepository(
     override fun saveAllIgnoringDuplicates(articles: List<Article>) {
         if (articles.isEmpty()) return
 
-        val now = Timestamp.from(Instant.now())
         val sql = """
             INSERT IGNORE 
             INTO article (blog_id, title, link, guid, pub_date, views, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP(6), CURRENT_TIMESTAMP(6));
         """.trimIndent()
 
         val batchArgs = articles.map { article ->
@@ -33,8 +30,6 @@ class ArticleRepository(
                 article.guid,
                 article.pubDate,
                 article.views,
-                now,
-                now
             )
         }
 
