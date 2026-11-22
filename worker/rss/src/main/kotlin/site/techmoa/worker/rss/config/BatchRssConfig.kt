@@ -6,11 +6,13 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
+import java.time.Duration
 
 @Configuration
 @EnableScheduling
 class BatchRssConfig {
 
+    private val shutdownGracePeriod = Duration.ofSeconds(40)
     private val log = LoggerFactory.getLogger(this.javaClass)
 
     @Bean("rssTaskScheduler")
@@ -18,7 +20,7 @@ class BatchRssConfig {
         val scheduler = ThreadPoolTaskScheduler()
         scheduler.threadNamePrefix = "rss-scheduler-"
         scheduler.setWaitForTasksToCompleteOnShutdown(true)
-        scheduler.setAwaitTerminationSeconds(30)
+        scheduler.setAwaitTerminationMillis(shutdownGracePeriod.toMillis())
         scheduler.setErrorHandler { ex ->
             log.error("[BatchRssConfig] Scheduled task execution failed", ex)
         }
@@ -30,7 +32,7 @@ class BatchRssConfig {
     fun rssFetchExecutor(): SimpleAsyncTaskExecutor {
         val executor = SimpleAsyncTaskExecutor("rss-fetch-")
         executor.setVirtualThreads(true)
-        executor.setTaskTerminationTimeout(30_000)
+        executor.setTaskTerminationTimeout(shutdownGracePeriod.toMillis())
         return executor
     }
 }

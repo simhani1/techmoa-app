@@ -91,7 +91,8 @@ jobs:
           NETWORK=monitor-net
 
           docker pull $IMAGE
-          docker stop $CONTAINER || true
+          # Allow the 40s RSS grace period plus JVM cleanup before SIGKILL.
+          docker stop --timeout 50 "$CONTAINER" || true
           docker rm $CONTAINER || true
 
           docker run -d \
