@@ -1,5 +1,7 @@
 package site.techmoa.worker.scheduler.service
 
+import site.techmoa.domain.model.WebhookPlatform
+
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -24,8 +26,8 @@ class ScanNewArticlesServiceTest : BehaviorSpec({
             every { cursor.getLastScannedArticle() } returns LastScannedArticleDto()
             every { articleRepository.findByIdGreaterThan(any()) } returns articles
             every { webhookRepository.getValidWebhook() } returns listOf(
-                RegisteredWebhook(10, "https://example.org/a", start),
-                RegisteredWebhook(20, "https://example.org/b", start.plusNanos(1000)),
+                RegisteredWebhook(10, "https://example.org/a", start, WebhookPlatform.DISCORD),
+                RegisteredWebhook(20, "https://example.org/b", start.plusNanos(1000), WebhookPlatform.DISCORD),
             )
 
             ScanNewArticlesService(cursor, outbox, articleRepository, webhookRepository).execute()
@@ -33,8 +35,8 @@ class ScanNewArticlesServiceTest : BehaviorSpec({
             val firstWebhook = slot<List<ArticleNotification>>()
             val secondWebhook = slot<List<ArticleNotification>>()
             verifyOrder {
-                outbox.enqueue(10, capture(firstWebhook))
-                outbox.enqueue(20, capture(secondWebhook))
+                outbox.enqueue(10, WebhookPlatform.DISCORD, capture(firstWebhook))
+                outbox.enqueue(20, WebhookPlatform.DISCORD, capture(secondWebhook))
                 cursor.sync(2)
             }
             firstWebhook.captured.map { it.articleId } shouldBe listOf(1L, 2L)

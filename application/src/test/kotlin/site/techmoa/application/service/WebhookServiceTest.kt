@@ -14,10 +14,12 @@ import site.techmoa.domain.model.Webhook
 import site.techmoa.domain.model.WebhookPlatform
 
 class WebhookServiceTest : BehaviorSpec({
+    val sender = mockk<site.techmoa.domain.event.WebhookSender>(relaxUnitFun = true)
+    every { sender.platform } returns DISCORD
     given("웹훅을 등록할 때") {
         `when`("이미 등록된 웹훅인 경우") {
             val webhookPort = mockk<WebhookPort>()
-            val saveWebhookUseCase = SaveWebhookUseCase(webhookPort)
+            val saveWebhookUseCase = SaveWebhookUseCase(webhookPort, listOf(sender))
             val webhookService = WebhookService(saveWebhookUseCase)
             every { webhookPort.existsBy(DISCORD, WEBHOOK_URL) } returns true
 
@@ -27,7 +29,7 @@ class WebhookServiceTest : BehaviorSpec({
                 }
 
                 exception.errorCode shouldBe ErrorCode.DUPLICATED_WEBHOOK
-                exception.message shouldBe "Webhook already exists. platform=DISCORD, url=$WEBHOOK_URL"
+                exception.message shouldBe "Webhook already exists. platform=DISCORD"
                 verify(exactly = 1) { webhookPort.existsBy(DISCORD, WEBHOOK_URL) }
                 verify(exactly = 0) { webhookPort.save(any()) }
             }
@@ -35,7 +37,7 @@ class WebhookServiceTest : BehaviorSpec({
 
         `when`("플랫폼과 URL로 저장을 요청하면") {
             val webhookPort = mockk<WebhookPort>()
-            val saveWebhookUseCase = SaveWebhookUseCase(webhookPort)
+            val saveWebhookUseCase = SaveWebhookUseCase(webhookPort, listOf(sender))
             val webhookService = WebhookService(saveWebhookUseCase)
             val savedWebhook = Webhook.of(
                 id = SAVED_WEBHOOK_ID,

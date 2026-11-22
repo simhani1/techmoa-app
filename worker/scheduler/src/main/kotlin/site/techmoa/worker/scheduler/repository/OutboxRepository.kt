@@ -1,5 +1,7 @@
 package site.techmoa.worker.scheduler.repository
 
+import site.techmoa.domain.model.WebhookPlatform
+
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
@@ -15,16 +17,16 @@ class OutboxRepository(
     private val objectMapper: ObjectMapper,
 ) {
 
-    fun enqueue(webhookId: Long, notifications: List<ArticleNotification>) {
+    fun enqueue(webhookId: Long, platform: WebhookPlatform, notifications: List<ArticleNotification>) {
         val rows = notifications.map { notification ->
-            arrayOf<Any>(webhookId, notification.articleId, UUID.randomUUID().toString(),
+            arrayOf<Any>(webhookId, platform.name, notification.articleId, UUID.randomUUID().toString(),
                 objectMapper.writeValueAsString(notification))
         }
         jdbcTemplate.batchUpdate(
             """INSERT INTO outbox_messages (
-                   webhook_id, event_type, aggregate_type, aggregate_id,
+                   webhook_id, platform, event_type, aggregate_type, aggregate_id,
                    idempotency_key, payload, payload_type, status
-               ) VALUES (?, 'NEW_ARTICLE', 'ARTICLE', ?, ?, ?, 'application/json', 'PENDING')
+               ) VALUES (?, ?, 'NEW_ARTICLE', 'ARTICLE', ?, ?, ?, 'application/json', 'PENDING')
                ON DUPLICATE KEY UPDATE webhook_id = VALUES(webhook_id)""",
             rows
         )
@@ -32,29 +34,31 @@ class OutboxRepository(
 
     data class PendingDelivery(val outboxId: Long, val payload: String)
 
+    data class Destination(val webhookId: Long, val platform: WebhookPlatform)
+
     @Transactional(readOnly = true)
-    fun findReadyWebhookIds(): List<Long> = jdbcTemplate.queryForList(
-        """SELECT o.webhook_id FROM outbox_messages o
+    fun findReadyDestinations(): List<Destination> = jdbcTemplate.query(
+        """SELECT o.webhook_id, o.platform FROM outbox_messages o
            LEFT JOIN webhook_retry r ON r.webhook_id = o.webhook_id
            WHERE o.status = 'PENDING' AND o.webhook_id IS NOT NULL
              AND (r.retry_at IS NULL OR r.retry_at <= CURRENT_TIMESTAMP(6))
-             AND EXISTS (SELECT 1 FROM webhook_dispatch_clock
-                         WHERE id = 1 AND retry_at <= CURRENT_TIMESTAMP(6))
-           GROUP BY o.webhook_id ORDER BY MIN(o.outbox_message_id)""",
-        Long::class.java
+             AND NOT EXISTS (SELECT 1 FROM webhook_platform_retry p
+                             WHERE p.platform = o.platform AND p.retry_at > CURRENT_TIMESTAMP(6))
+           GROUP BY o.webhook_id, o.platform ORDER BY MIN(o.outbox_message_id)""",
+        RowMapper { rs, _ -> Destination(rs.getLong(1), WebhookPlatform.valueOf(rs.getString(2))) }
     )
 
     @Transactional(readOnly = true)
-    fun findPendingDeliveries(webhookId: Long): List<PendingDelivery> = jdbcTemplate.query(
+    fun findPendingDeliveries(destination: Destination): List<PendingDelivery> = jdbcTemplate.query(
         """SELECT outbox_message_id, payload FROM outbox_messages
-           WHERE webhook_id = ? AND status = 'PENDING'
+           WHERE webhook_id = ? AND platform = ? AND status = 'PENDING'
            ORDER BY outbox_message_id LIMIT 20""",
         RowMapper { rs, _ -> PendingDelivery(rs.getLong(1), rs.getString(2)) },
-        webhookId
+        destination.webhookId, destination.platform.name
     )
 
     @Transactional
-    fun recordDeliveryResults(webhookId: Long, sentOutboxIds: List<Long>, failureReasonsByOutboxId: Map<Long, String>, rateLimit: WebhookRateLimited?) {
+    fun recordDeliveryResults(destination: Destination, sentOutboxIds: List<Long>, failureReasonsByOutboxId: Map<Long, String>, rateLimit: WebhookRateLimited?) {
         if (sentOutboxIds.isNotEmpty()) {
             val placeholders = sentOutboxIds.joinToString { "?" }
             jdbcTemplate.update(
@@ -69,22 +73,23 @@ class OutboxRepository(
                 failureReasonsByOutboxId.map { (id, reason) -> arrayOf<Any>(reason, id) }
             )
         }
-        if (rateLimit != null) defer(webhookId, rateLimit.delayMillis, rateLimit.global)
+        if (rateLimit != null) defer(destination, rateLimit.delayMillis, rateLimit.global)
     }
 
-    private fun defer(webhookId: Long, delayMillis: Long, global: Boolean) {
+    private fun defer(destination: Destination, delayMillis: Long, global: Boolean) {
         val micros = Math.multiplyExact(delayMillis, 1000L)
         if (global) {
             jdbcTemplate.update(
-                "UPDATE webhook_dispatch_clock SET retry_at = TIMESTAMPADD(MICROSECOND, ?, CURRENT_TIMESTAMP(6)) WHERE id = 1",
-                micros
+                """INSERT INTO webhook_platform_retry (platform, retry_at) VALUES (?, TIMESTAMPADD(MICROSECOND, ?, CURRENT_TIMESTAMP(6)))
+                   ON DUPLICATE KEY UPDATE retry_at = VALUES(retry_at)""",
+                destination.platform.name, micros
             )
         } else {
             jdbcTemplate.update(
                 """INSERT INTO webhook_retry (webhook_id, retry_at)
                    VALUES (?, TIMESTAMPADD(MICROSECOND, ?, CURRENT_TIMESTAMP(6)))
                    ON DUPLICATE KEY UPDATE retry_at = VALUES(retry_at)""",
-                webhookId, micros
+                destination.webhookId, micros
             )
         }
     }

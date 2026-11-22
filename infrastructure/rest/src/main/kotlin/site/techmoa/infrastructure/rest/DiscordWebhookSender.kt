@@ -1,5 +1,9 @@
 package site.techmoa.infrastructure.rest
 
+import site.techmoa.domain.model.WebhookPlatform
+import java.net.URI
+import site.techmoa.domain.exception.InvalidWebhookUrlException
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import site.techmoa.domain.event.WebhookSender
@@ -16,25 +20,44 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Component
-class DiscordClient(
+class DiscordWebhookSender(
     webClient: WebClient.Builder,
     private val mapper: ObjectMapper
 ) : WebhookSender {
     private companion object {
+        val WEBHOOK_PATH = Regex("/api/(?:v[0-9]+/)?webhooks/[0-9]+/[A-Za-z0-9_-]+")
         const val RETRY_DELAY_MULTIPLIER = 1.2
     }
 
     private val discordClient = webClient.build()
 
+    override val platform = WebhookPlatform.DISCORD
+
+    override fun validateWebhookUrl(url: String) {
+        val uri = try {
+            URI(url)
+        } catch (_: java.net.URISyntaxException) {
+            throw InvalidWebhookUrlException("Invalid Discord webhook URL")
+        }
+        val valid = uri.scheme.equals("https", ignoreCase = true) &&
+            uri.host.equals("discord.com", ignoreCase = true) &&
+            uri.rawUserInfo == null && uri.port in setOf(-1, 443) &&
+            uri.rawQuery == null && uri.rawFragment == null &&
+            WEBHOOK_PATH.matches(uri.rawPath.orEmpty())
+        if (!valid) throw InvalidWebhookUrlException("Invalid Discord webhook URL")
+    }
+
     override fun publish(message: ArticleNotification) {
+        validateWebhookUrl(message.webhookUrl)
         try {
-            discordClient.post()
+            val response = discordClient.post()
                 .uri(message.webhookUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(toDiscordPayload(message))
                 .retrieve()
                 .toBodilessEntity()
                 .block(Duration.ofSeconds(15))
+            check(response?.statusCode?.is2xxSuccessful == true) { "Discord webhook delivery failed" }
         } catch (ex: WebClientResponseException.TooManyRequests) {
             val body = try {
                 mapper.readTree(ex.responseBodyAsString)

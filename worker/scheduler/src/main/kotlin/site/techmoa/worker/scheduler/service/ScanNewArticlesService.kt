@@ -34,7 +34,7 @@ class ScanNewArticlesService(
                     webhookUrl = webhook.url,
                 ))
             }
-            if (notifications.isNotEmpty()) outboxRepository.enqueue(webhook.id, notifications)
+            if (notifications.isNotEmpty()) outboxRepository.enqueue(webhook.id, webhook.platform, notifications)
         }
         lastScannedArticleUseCase.sync(newArticles.last().articleId)
     }

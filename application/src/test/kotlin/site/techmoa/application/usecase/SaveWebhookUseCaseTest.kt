@@ -1,5 +1,7 @@
 package site.techmoa.application.usecase
 
+import site.techmoa.domain.event.WebhookSender
+
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -16,7 +18,9 @@ import site.techmoa.domain.model.WebhookValidity
 class SaveWebhookUseCaseTest : BehaviorSpec({
     given("새로운 webhook url 저장 상황에서") {
         val webhookPort = mockk<WebhookPort>()
-        val useCase = SaveWebhookUseCase(webhookPort)
+        val sender = mockk<WebhookSender>(relaxUnitFun = true)
+        every { sender.platform } returns WebhookPlatform.DISCORD
+        val useCase = SaveWebhookUseCase(webhookPort, listOf(sender))
         val captured = slot<Webhook>()
 
         every { webhookPort.existsBy(WebhookPlatform.DISCORD, "https://discord.com/api/webhooks/123") } returns false
@@ -36,6 +40,7 @@ class SaveWebhookUseCaseTest : BehaviorSpec({
                 result.id shouldBe 1L
                 result.platform shouldBe WebhookPlatform.DISCORD
                 result.url shouldBe "https://discord.com/api/webhooks/123"
+                verify(exactly = 1) { sender.validateWebhookUrl(result.url) }
                 verify(exactly = 1) { webhookPort.save(any()) }
             }
         }
@@ -43,7 +48,9 @@ class SaveWebhookUseCaseTest : BehaviorSpec({
 
     given("이미 등록된 webhook url 저장 상황에서") {
         val webhookPort = mockk<WebhookPort>()
-        val useCase = SaveWebhookUseCase(webhookPort)
+        val sender = mockk<WebhookSender>(relaxUnitFun = true)
+        every { sender.platform } returns WebhookPlatform.DISCORD
+        val useCase = SaveWebhookUseCase(webhookPort, listOf(sender))
 
         every { webhookPort.existsBy(WebhookPlatform.DISCORD, "https://discord.com/api/webhooks/dup") } returns true
 
