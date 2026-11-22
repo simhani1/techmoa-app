@@ -5,9 +5,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import site.techmoa.domain.event.OutboxMessages
-import site.techmoa.domain.event.OutboxStatus
-import java.sql.Timestamp
-import java.time.Instant
+import site.techmoa.domain.event.WebhookRateLimited
 
 @Repository(value = "SchedulesOutboxRepository")
 class OutboxRepository(
@@ -42,76 +40,49 @@ class OutboxRepository(
         jdbcTemplate.batchUpdate(sql, args)
     }
 
-    @Transactional
-    fun markSuccess(outboxId: Long) {
-        val now = Timestamp.from(Instant.now())
-        val sql = """
-            UPDATE outbox_messages
-            SET status = ?,
-                published_at = ?,
-                last_error_message = NULL
-            WHERE outbox_message_id = ?
-        """.trimIndent()
+    data class Delivery(val id: Long, val payload: String)
 
-        jdbcTemplate.update(
-            sql,
-            OutboxStatus.SUCCESS.name,
-            now,
-            outboxId
-        )
-    }
-
-    @Transactional
-    fun markFailed(outboxId: Long, errorMessage: String) {
-        val sql = """
-            UPDATE outbox_messages
-            SET status = ?,
-                published_at = NULL,
-                last_error_message = ?
-            WHERE outbox_message_id = ?;
-        """.trimIndent()
-
-        jdbcTemplate.update(
-            sql,
-            OutboxStatus.FAIL.name,
-            errorMessage,
-            outboxId
-        )
-    }
-
-    data class Delivery(val id: Long, val webhookId: Long, val payload: String)
-
-    // The caller holds this singleton row lock until one bounded HTTP request completes.
-    fun acquireDispatcher(): Boolean = jdbcTemplate.queryForList(
-        """SELECT id FROM webhook_dispatch_clock
-           WHERE id = 1 AND retry_at <= CURRENT_TIMESTAMP(6) FOR UPDATE SKIP LOCKED""",
+    @Transactional(readOnly = true)
+    fun readyWebhooks(): List<Long> = jdbcTemplate.queryForList(
+        """SELECT o.webhook_id FROM outbox_messages o
+           LEFT JOIN webhook_retry r ON r.webhook_id = o.webhook_id
+           WHERE o.status = 'PENDING' AND o.webhook_id IS NOT NULL
+             AND (r.retry_at IS NULL OR r.retry_at <= CURRENT_TIMESTAMP(6))
+             AND EXISTS (SELECT 1 FROM webhook_dispatch_clock
+                         WHERE id = 1 AND retry_at <= CURRENT_TIMESTAMP(6))
+           GROUP BY o.webhook_id ORDER BY MIN(o.outbox_message_id)""",
         Long::class.java
-    ).isNotEmpty()
+    )
 
-    fun nextDelivery(preferredWebhook: Long?): Delivery? {
-        if (preferredWebhook != null) {
-            findPending(preferredWebhook)?.let { return it }
+    @Transactional(readOnly = true)
+    fun pending(webhookId: Long): List<Delivery> = jdbcTemplate.query(
+        """SELECT outbox_message_id, payload FROM outbox_messages
+           WHERE webhook_id = ? AND status = 'PENDING'
+           ORDER BY outbox_message_id LIMIT 20""",
+        RowMapper { rs, _ -> Delivery(rs.getLong(1), rs.getString(2)) },
+        webhookId
+    )
+
+    @Transactional
+    fun saveResults(webhookId: Long, sent: List<Long>, failures: Map<Long, String>, limit: WebhookRateLimited?) {
+        if (sent.isNotEmpty()) {
+            val placeholders = sent.joinToString { "?" }
+            jdbcTemplate.update(
+                """UPDATE outbox_messages SET status = 'SUCCESS', published_at = CURRENT_TIMESTAMP(6),
+                   last_error_message = NULL WHERE outbox_message_id IN ($placeholders)""",
+                *sent.toTypedArray()
+            )
         }
-        return findPending(null)
+        if (failures.isNotEmpty()) {
+            jdbcTemplate.batchUpdate(
+                "UPDATE outbox_messages SET status = 'FAIL', last_error_message = ? WHERE outbox_message_id = ?",
+                failures.map { (id, reason) -> arrayOf<Any>(reason, id) }
+            )
+        }
+        if (limit != null) defer(webhookId, limit.delayMillis, limit.global)
     }
 
-    private fun findPending(webhookId: Long?): Delivery? {
-        val destinationFilter = if (webhookId == null) "" else "AND o.webhook_id = ?"
-        val args = listOfNotNull(webhookId).toTypedArray()
-        return jdbcTemplate.query(
-            """SELECT o.outbox_message_id, o.webhook_id, o.payload
-               FROM outbox_messages o
-               LEFT JOIN webhook_retry r ON r.webhook_id = o.webhook_id
-               WHERE o.status = 'PENDING' AND o.webhook_id IS NOT NULL
-                 $destinationFilter
-                 AND (r.retry_at IS NULL OR r.retry_at <= CURRENT_TIMESTAMP(6))
-               ORDER BY o.outbox_message_id LIMIT 1""",
-            RowMapper { rs, _ -> Delivery(rs.getLong(1), rs.getLong(2), rs.getString(3)) },
-            *args
-        ).firstOrNull()
-    }
-
-    fun defer(webhookId: Long, delayMillis: Long, global: Boolean) {
+    private fun defer(webhookId: Long, delayMillis: Long, global: Boolean) {
         val micros = Math.multiplyExact(delayMillis, 1000L)
         if (global) {
             jdbcTemplate.update(
