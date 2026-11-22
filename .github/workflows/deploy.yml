@@ -82,8 +82,17 @@ jobs:
     needs: build
     name: deploy
     runs-on: self-hosted
+    permissions:
+      packages: read
 
     steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Deploy
         run: |
           IMAGE=ghcr.io/simhani1/techmoa:latest
