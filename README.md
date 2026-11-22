@@ -16,15 +16,6 @@ TechMoa App은 여러 기술 블로그의 RSS를 수집해 아티클을 통합 �
 
 ![Discord 알림 예시](docs/images/discord-notification.png)
 
-## API
-
-- `GET /v1/articles`, `GET /v1/articles/{articleId}`, `POST /v1/articles/{articleId}`
-- `GET /v1/blogs`
-- `GET /v1/oauth/kakao/callback`, `POST /v1/auth/signup`
-- `POST /v1/webhooks`
-
-요청·응답 상세는 [docs/api.md](docs/api.md)를 참고하세요.
-
 ## 멀티모듈 구조
 
 ```mermaid
