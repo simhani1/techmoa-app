@@ -20,6 +20,10 @@ class DiscordClient(
     webClient: WebClient.Builder,
     private val mapper: ObjectMapper
 ) : WebhookSender {
+    private companion object {
+        const val RETRY_DELAY_MULTIPLIER = 1.2
+    }
+
     private val discordClient = webClient.build()
 
     override fun publish(message: OutboxPayload) {
@@ -40,7 +44,7 @@ class DiscordClient(
             val global = ex.headers.getFirst("X-RateLimit-Global") == "true" ||
                 ex.headers.getFirst("X-RateLimit-Scope") == "global" ||
                 body?.get("global")?.asBoolean() == true
-            throw WebhookRateLimited(ceil(seconds * 1000).toLong(), global)
+            throw WebhookRateLimited(ceil(seconds * 1000 * RETRY_DELAY_MULTIPLIER).toLong(), global)
         }
     }
 
