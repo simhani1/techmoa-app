@@ -1,0 +1,28 @@
+discovery.docker "rss" {
+  host = "unix:///var/run/docker.sock"
+  filter {
+    name = "name"
+    values = ["^/techmoa-app$"]
+  }
+}
+
+loki.source.docker "rss" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.rss.targets
+  labels     = { job = "techmoa-rss" }
+  forward_to = [loki.process.rss.receiver]
+}
+
+loki.process "rss" {
+  stage.match {
+    selector = "{job=\"techmoa-rss\"} !~ \"Failed to collect RSS[.] blogId=|RSS collect finished[.] total=\""
+    action   = "drop"
+  }
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
