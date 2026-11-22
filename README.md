@@ -17,7 +17,7 @@ TechMoa App은 여러 기술 블로그의 RSS를 수집해 아티클을 통합 �
 
 ## 인프라 구조
 
-홈서버(Linux)에 Docker 컨테이너로 배포합니다. GitHub Actions가 이미지를 GHCR에 올리면 self-hosted runner가 받아 배포하고, 앱 로그는 Loki로 수집해 Grafana로 시각화합니다. 새 글 알림은 Discord, Slack 등 여러 메신저를 한 그룹으로 묶은 웹훅 플랫폼으로 전송하며, 새 메신저는 같은 방식으로 추가할 수 있습니다. 원본은 [infra.drawio](docs/images/infra.drawio)입니다.
+홈서버(Linux)에 Docker 컨테이너로 배포합니다. GitHub Actions가 이미지를 GHCR에 올리면 self-hosted runner가 받아 배포하고, 앱 로그는 Loki로 수집해 Grafana로 시각화합니다. 새 글 알림은 Discord, Slack 등 여러 메신저를 한 그룹으로 묶은 웹훅 플랫폼으로 전송하며, 새 메신저는 같은 방식으로 추가할 수 있습니다.
 
 ![인프라 구조도](docs/images/infra.png)
 
